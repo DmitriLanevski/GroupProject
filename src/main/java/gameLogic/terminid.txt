@@ -1,0 +1,4 @@
+event funktsiooni ees tähendab, et see kutsub buffide meetodeid välja
+kui ei taha buffe teavitada, kutsu välja meetod millel pole event ees
+
+shared tähendab, et teavitatakse mõlema tegelase buffe
