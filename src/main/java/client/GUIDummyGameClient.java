@@ -1,5 +1,8 @@
 package client;
 
+import com.google.gson.Gson;
+import javafx.application.Platform;
+import server.MessageTypes;
 import server.ServerPlayerData;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
@@ -12,9 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -23,14 +24,16 @@ import java.net.Socket;
  */
 public class GUIDummyGameClient extends Application {
 
+    public static Gson gson = new Gson();
+
     private Socket socket;
-    private ObjectOutputStream oos;
-    private ObjectInputStream ois;
+    private DataOutputStream output;
+    private DataInputStream input;
     private ServerPlayerData data;
 
-    void sendMessage(String messageType, Object message) throws IOException {
-        oos.writeUTF(messageType);
-        oos.writeObject(message);
+    void sendMessage(int messageType, Object message) throws IOException {
+        output.writeInt(messageType);
+        output.writeUTF(gson.toJson(message));
     }
 
     public static void main(String[] args) {
@@ -40,15 +43,15 @@ public class GUIDummyGameClient extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         socket = new Socket(InetAddress.getLocalHost(), 1337);
-        oos = new ObjectOutputStream(socket.getOutputStream());
-        oos.flush(); // DO NOT REMOVE
-        ois = new ObjectInputStream(socket.getInputStream());
+        output = new DataOutputStream(socket.getOutputStream());
+        input = new DataInputStream(socket.getInputStream());
 
         data = new ServerPlayerData();
         data.spectator = false;
         data.name = "Dude";
-        oos.writeObject(data);
-        data = (ServerPlayerData)ois.readObject();
+
+        output.writeUTF(gson.toJson(data));
+        data = gson.fromJson(input.readUTF(), ServerPlayerData.class);
 
 
         Group root = new Group();
@@ -63,7 +66,7 @@ public class GUIDummyGameClient extends Application {
             @Override
             public void handle(ActionEvent event) {
                 try {
-                    sendMessage("text", inputTextField.getText());
+                    sendMessage(MessageTypes.TEXT, inputTextField.getText());
                     inputTextField.clear();
                 }
                 catch (Exception e) {
@@ -79,22 +82,22 @@ public class GUIDummyGameClient extends Application {
         textDisplay.setPrefWidth(235);
         root.getChildren().add(textDisplay);
 
-        new AnimationTimer() {
+        new Thread(new Runnable() {
             @Override
-            public void handle(long now) {
+            public void run() {
                 try {
-                    while (ois.available() > 0) {
-                        String messageType = ois.readUTF();
+                    while (!socket.isClosed()) {
+                        int messageType = input.readInt();
                         switch(messageType) {
-                            case "text": {
-                                String s = (String)ois.readObject();
-                                textDisplay.appendText("\n"+s);
+                            case MessageTypes.TEXT: {
+                                String s = gson.fromJson(input.readUTF(), String.class);
+                                Platform.runLater(()->textDisplay.appendText("\n"+s));
                                 System.out.println(s);
                                 break;
                             }
-                            case "server_message": {
-                                String s = (String)ois.readObject();
-                                textDisplay.appendText("\n"+s);
+                            case MessageTypes.SERVER_MESSAGE: {
+                                String s = gson.fromJson(input.readUTF(), String.class);
+                                Platform.runLater(()->textDisplay.appendText("\n"+s));
                                 System.out.println(s);
                                 break;
                             }
@@ -108,7 +111,7 @@ public class GUIDummyGameClient extends Application {
                     throw new RuntimeException(e);
                 }
             }
-        }.start();
+        }).start();
 
         primaryStage.setScene(scene);
         primaryStage.show();

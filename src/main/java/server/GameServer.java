@@ -1,78 +1,96 @@
 package server;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class GameServer implements Runnable {
 
-    private final ServerSocket serverSocket;
+    public static Gson gson = new Gson();
+    private final int port;
+
     private final Object lock = new Object();
-    private final List<Thread> threads = new ArrayList<>();
-    private final List<ObjectOutputStream> connections = new ArrayList<>();
+
     private final List<ServerPlayerData> players = new ArrayList<>();
+    private final List<BlockingQueue<Message>> playerMessageQueues = new ArrayList<>();
+
     private int numberOfPlayers = 0;
 
-    public GameServer(int port) throws IOException {
-        serverSocket = new ServerSocket(port);
+    public GameServer(int port) {
+        this.port = port;
     }
 
-    private void sendToAll(String messageType, Object message) throws IOException {
-        System.out.println("Sending message " + messageType + " " + message);
-        for (ObjectOutputStream connection : connections) {
-            connection.writeUTF(messageType);
-            connection.writeObject(message);
+    private void sendToAll(Message message) {
+        synchronized (playerMessageQueues) { // ensures all players get all the messages in the same order
+            System.out.println(message.getGsonObject());
+            for (BlockingQueue<Message> queue : playerMessageQueues) {
+                queue.add(message);
+            }
         }
+    }
+    private void sendToAll(int messageType, Object object) {
+        sendToAll(new Message( messageType, object ));
     }
 
     @Override
     public void run() {
         System.out.println("Starting server.");
-        try {
+
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();
-                synchronized (lock) {
-                    System.out.println("New connection");
-                    ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
-                    oos.flush(); // DO NOT REMOVE
-                    ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 
-                    ServerPlayerData newPlayer = (ServerPlayerData)ois.readObject();
-                    if (!newPlayer.spectator) {
-                        if (numberOfPlayers >= 2 )
-                            newPlayer.spectator = true;
-                        else
-                            numberOfPlayers++;
-                    }
-                    for (ServerPlayerData player : players) {
-                        if (player.name.equals(newPlayer.name))
-                            newPlayer.name += "!";
-                    }
-                    oos.writeObject(newPlayer);
+                System.out.println("New connection");
 
-                    Thread thread = new Thread(new PlayerConnector(newPlayer, ois, socket));
-                    connections.add(oos);
-                    players.add(newPlayer);
-                    thread.start();
+                DataOutputStream output = new DataOutputStream(socket.getOutputStream());
+                DataInputStream input = new DataInputStream(socket.getInputStream());
 
-                    System.out.println(newPlayer.name + " has joined as a " + (newPlayer.spectator ? "spectator." : "player."));
-                    sendToAll("server_message", newPlayer.name + " has joined as a " + (newPlayer.spectator ? "spectator." : "player.") );
+                ServerPlayerData newPlayer = gson.fromJson(input.readUTF(), ServerPlayerData.class);
+                if (!newPlayer.spectator) {
+                    if (numberOfPlayers >= 2 )
+                        newPlayer.spectator = true;
+                    else
+                        numberOfPlayers++;
                 }
+                for (ServerPlayerData player : players) {
+                    if (player.name.equals(newPlayer.name))
+                        newPlayer.name += "!";
+                }
+                output.writeUTF(gson.toJson(newPlayer));
+
+                synchronized (lock) {
+                    BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
+                    playerMessageQueues.add(queue);
+                    players.add(newPlayer);
+                    new Thread(new PlayerReciever(newPlayer, input, socket)).start();
+                    new Thread(new PlayerMessager(newPlayer, socket, output, queue)).start();
+                }
+
+                System.out.println(newPlayer.name + " has joined as a " + (newPlayer.spectator ? "spectator." : "player."));
+                sendToAll(MessageTypes.SERVER_MESSAGE, newPlayer.name + " has joined as a " + (newPlayer.spectator ? "spectator." : "player."));
             }
+
         }
         catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    class PlayerConnector implements Runnable {
+    class PlayerReciever implements Runnable {
         private final Socket playerSocket;
-        private final ObjectInputStream input;
+        private final DataInputStream input;
         private final ServerPlayerData data;
 
-        public PlayerConnector(ServerPlayerData data, ObjectInputStream input, Socket playerSocket) {
+        public PlayerReciever(ServerPlayerData data, DataInputStream input, Socket playerSocket) {
             this.data = data;
             this.input = input;
             this.playerSocket = playerSocket;
@@ -83,19 +101,48 @@ public class GameServer implements Runnable {
             try {
 
                 while (!playerSocket.isClosed()) {
-                    String messageType = input.readUTF();
-                    System.out.println(messageType);
-                    synchronized (lock) {
-                        switch(messageType) {
-                            case "text": {
-                                sendToAll(messageType, data.name + ": " + input.readObject());
-                                break;
-                            }
-                            default: {
-                                throw new RuntimeException("Invalid message of type '" + messageType + "'");
-                            }
+                    int messageType = input.readInt();
+
+                    switch(messageType) {
+                        case MessageTypes.TEXT: {
+                            String s = gson.fromJson(input.readUTF(), String.class);
+                            sendToAll( MessageTypes.TEXT, data.name + ": " + s );
+                            System.out.println(s);
+                            break;
+                        }
+                        default: {
+                            throw new RuntimeException("Invalid message of type '" + messageType + "'");
                         }
                     }
+                }
+
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    class PlayerMessager implements Runnable {
+        private final Socket playerSocket;
+        private final ServerPlayerData data;
+        private final DataOutputStream output;
+        private final BlockingQueue<Message> queue;
+
+        public PlayerMessager(ServerPlayerData data, Socket playerSocket, DataOutputStream output, BlockingQueue<Message> queue) {
+            this.data = data;
+            this.playerSocket = playerSocket;
+            this.output = output;
+            this.queue = queue;
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (!playerSocket.isClosed()) {
+                    Message sendingMessage = queue.take();
+
+                    output.writeInt(sendingMessage.getMessageType());
+                    output.writeUTF(sendingMessage.getGsonObject());
                 }
 
             } catch (Exception e) {
