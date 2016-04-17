@@ -6,7 +6,9 @@ import com.google.gson.GsonBuilder;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -19,8 +21,8 @@ public class GameServer implements Runnable {
 
     private final Object lock = new Object();
 
-    private final List<ServerPlayerData> players = new ArrayList<>();
-    private final List<BlockingQueue<Message>> playerMessageQueues = new ArrayList<>();
+    private final List<ServerPlayerData> players = Collections.synchronizedList(new ArrayList<>());
+    private final List<BlockingQueue<Message>> playerMessageQueues = Collections.synchronizedList(new ArrayList<>());
 
     private int numberOfPlayers = 0;
 
@@ -30,7 +32,6 @@ public class GameServer implements Runnable {
 
     private void sendToAll(Message message) {
         synchronized (playerMessageQueues) { // ensures all players get all the messages in the same order
-            System.out.println(message.getGsonObject());
             for (BlockingQueue<Message> queue : playerMessageQueues) {
                 queue.add(message);
             }
@@ -66,14 +67,14 @@ public class GameServer implements Runnable {
                         newPlayer.name += "!";
                 }
                 output.writeUTF(gson.toJson(newPlayer));
+                
 
-                synchronized (lock) {
-                    BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
-                    playerMessageQueues.add(queue);
-                    players.add(newPlayer);
-                    new Thread(new PlayerReciever(newPlayer, input, socket)).start();
-                    new Thread(new PlayerMessager(newPlayer, socket, output, queue)).start();
-                }
+                BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
+                playerMessageQueues.add(queue);
+                players.add(newPlayer);
+                new Thread(new PlayerReciever(newPlayer, input, socket)).start();
+                new Thread(new PlayerMessager(newPlayer, socket, output, queue)).start();
+
 
                 System.out.println(newPlayer.name + " has joined as a " + (newPlayer.spectator ? "spectator." : "player."));
                 sendToAll(MessageTypes.SERVER_MESSAGE, newPlayer.name + " has joined as a " + (newPlayer.spectator ? "spectator." : "player."));
@@ -115,7 +116,10 @@ public class GameServer implements Runnable {
                         }
                     }
                 }
-
+            }
+            catch (EOFException | SocketException e) {
+                // Connection lost, nothing to worry about.
+                sendToAll(MessageTypes.SERVER_MESSAGE, data.name + " has disconnected.");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -145,8 +149,16 @@ public class GameServer implements Runnable {
                     output.writeUTF(sendingMessage.getGsonObject());
                 }
 
-            } catch (Exception e) {
+            }
+            catch (SocketException e) {
+                // Connection lost, nothing to worry about.
+            }
+            catch (Exception e) {
                 throw new RuntimeException(e);
+            }
+            finally {
+                players.remove(data);
+                playerMessageQueues.remove(queue);
             }
         }
     }
