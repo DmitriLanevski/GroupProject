@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * Created by Stas on 17/04/2016.
  */
-public class UserDatabase {
+public class UserDatabase implements AutoCloseable {
 
     private final Connection conn;
 
@@ -22,6 +22,7 @@ public class UserDatabase {
         loadInitialData();
     }
 
+    @Override
     public void close() throws SQLException {
         conn.close();
     }

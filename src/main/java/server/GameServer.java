@@ -1,17 +1,17 @@
 package server;
 
 import com.google.gson.Gson;
+import serverDatabase.UserDatabase;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class GameServer implements Runnable {
 
@@ -21,7 +21,9 @@ public class GameServer implements Runnable {
     private final List<ServerPlayerInfo> players = Collections.synchronizedList(new ArrayList<>());
     private final Object messageOrderlock = new Object();
 
-    public GameServer(int port) {
+    private UserDatabase userDatabase;
+
+    public GameServer(int port) throws SQLException, IOException {
         this.port = port;
     }
 
@@ -36,7 +38,7 @@ public class GameServer implements Runnable {
         sendToAll(new Message( messageType, object ));
     }
 
-    private void handleMessage(int messageType, String message, ServerPlayerInfo sender) {
+    private void handleMessage(int messageType, String message, ServerPlayerInfo sender) throws Exception {
         switch(messageType) {
             case MessageTypes.TEXT: {
                 String s = gson.fromJson(message, String.class);
@@ -46,7 +48,7 @@ public class GameServer implements Runnable {
             }
             case MessageTypes.LOGIN: {
                 LoginData data = gson.fromJson(message, LoginData.class);
-                if (verifyLogin(data.userName, data.passwordHash)) {
+                if (verifyLogin(data.userName, data.password)) {
                     sender.setUserName(data.userName);
                     sender.setLoggedIn(true);
                 } else {
@@ -59,15 +61,19 @@ public class GameServer implements Runnable {
         }
     }
 
-    boolean verifyLogin(String username, int passwordHash) {
-        return true;
+    boolean verifyLogin(String username, String password) throws Exception {
+        return userDatabase.logIn(username, password);
     }
 
     @Override
     public void run() {
         System.out.println("Starting server.");
 
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try (
+                ServerSocket serverSocket = new ServerSocket(port);
+                UserDatabase userDatabase = new UserDatabase()
+        ) {
+            this.userDatabase = userDatabase; // kinda silly, but automatically closes the database
 
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();

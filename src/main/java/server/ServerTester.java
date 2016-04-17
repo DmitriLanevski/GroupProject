@@ -1,12 +1,10 @@
 package server;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
-/**
- * Created by Madis on 25.03.2016.
- */
 public class ServerTester {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, SQLException {
         Thread thread = new Thread(new GameServer(1337));
         thread.start();
     }
