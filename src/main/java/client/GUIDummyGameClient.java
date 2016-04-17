@@ -3,8 +3,7 @@ package client;
 import com.google.gson.Gson;
 import javafx.application.Platform;
 import server.MessageTypes;
-import server.ServerPlayerData;
-import javafx.animation.AnimationTimer;
+import server.ServerPlayerInfo;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -18,10 +17,8 @@ import javafx.stage.Stage;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
-/**
- * Created by Madis on 27.03.2016.
- */
 public class GUIDummyGameClient extends Application {
 
     public static Gson gson = new Gson();
@@ -29,7 +26,7 @@ public class GUIDummyGameClient extends Application {
     private Socket socket;
     private DataOutputStream output;
     private DataInputStream input;
-    private ServerPlayerData data;
+    private ServerPlayerInfo data;
 
     void sendMessage(int messageType, Object message) throws IOException {
         output.writeInt(messageType);
@@ -46,14 +43,6 @@ public class GUIDummyGameClient extends Application {
         output = new DataOutputStream(socket.getOutputStream());
         input = new DataInputStream(socket.getInputStream());
 
-        data = new ServerPlayerData();
-        data.spectator = false;
-        data.name = "Dude";
-
-        output.writeUTF(gson.toJson(data));
-        data = gson.fromJson(input.readUTF(), ServerPlayerData.class);
-
-
         Group root = new Group();
         Scene scene = new Scene(root, 235, 335, Color.SNOW);
 
@@ -69,6 +58,9 @@ public class GUIDummyGameClient extends Application {
                     sendMessage(MessageTypes.TEXT, inputTextField.getText());
                     inputTextField.clear();
                 }
+                catch (SocketException e) {
+                    inputTextField.clear();
+                }
                 catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -82,7 +74,7 @@ public class GUIDummyGameClient extends Application {
         textDisplay.setPrefWidth(235);
         root.getChildren().add(textDisplay);
 
-        new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -107,13 +99,23 @@ public class GUIDummyGameClient extends Application {
                         }
                     }
                 }
+                catch (SocketException e) {
+                    Platform.runLater(()->textDisplay.appendText("\n"+"Connection lost."));
+                }
                 catch (Exception e) {
                     throw new RuntimeException(e);
                 }
             }
-        }).start();
+        });
+        thread.start();
 
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        super.stop();
+        socket.close();
     }
 }
