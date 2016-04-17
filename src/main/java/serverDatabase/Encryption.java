@@ -20,7 +20,7 @@ public class Encryption {
         return enc.encodeToString(hash);
     }
 
-    public static boolean Check (String pPassword, String pHash)throws Exception {
+    public static boolean Check (String pPassword, String pHash) throws Exception {
         // System.out.println("... debug:   pHash="+pHash);
         String theHash = Encrypt(pPassword);
         // System.out.println("... debug: theHash="+theHash);
