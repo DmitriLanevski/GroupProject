@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -10,35 +9,58 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class GameServer implements Runnable {
 
     public static Gson gson = new Gson();
+
     private final int port;
-
-    private final Object lock = new Object();
-
-    private final List<ServerPlayerData> players = Collections.synchronizedList(new ArrayList<>());
-    private final List<BlockingQueue<Message>> playerMessageQueues = Collections.synchronizedList(new ArrayList<>());
-
-    private int numberOfPlayers = 0;
+    private final List<ServerPlayerInfo> players = Collections.synchronizedList(new ArrayList<>());
+    private final Object messageOrderlock = new Object();
 
     public GameServer(int port) {
         this.port = port;
     }
 
     private void sendToAll(Message message) {
-        synchronized (playerMessageQueues) { // ensures all players get all the messages in the same order
-            for (BlockingQueue<Message> queue : playerMessageQueues) {
-                queue.add(message);
+        synchronized (messageOrderlock) { // ensures all players get all the messages in the same order
+            for (ServerPlayerInfo player : players) {
+                player.sendMessage(message);
             }
         }
     }
     private void sendToAll(int messageType, Object object) {
         sendToAll(new Message( messageType, object ));
+    }
+
+    private void handleMessage(int messageType, String message, ServerPlayerInfo sender) {
+        switch(messageType) {
+            case MessageTypes.TEXT: {
+                String s = gson.fromJson(message, String.class);
+                sendToAll( MessageTypes.TEXT, sender.getUserName() + ": " + s );
+                System.out.println(s);
+                break;
+            }
+            case MessageTypes.LOGIN: {
+                LoginData data = gson.fromJson(message, LoginData.class);
+                if (verifyLogin(data.userName, data.passwordHash)) {
+                    sender.setUserName(data.userName);
+                    sender.setLoggedIn(true);
+                } else {
+                    sender.sendMessage(MessageTypes.SERVER_MESSAGE, "Failed to log in.");
+                }
+            }
+            default: {
+                throw new RuntimeException("Invalid message of type '" + messageType + "'");
+            }
+        }
+    }
+
+    boolean verifyLogin(String username, int passwordHash) {
+        return true;
     }
 
     @Override
@@ -51,33 +73,14 @@ public class GameServer implements Runnable {
                 Socket socket = serverSocket.accept();
 
                 System.out.println("New connection");
-
-                DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-                DataInputStream input = new DataInputStream(socket.getInputStream());
-
-                ServerPlayerData newPlayer = gson.fromJson(input.readUTF(), ServerPlayerData.class);
-                if (!newPlayer.spectator) {
-                    if (numberOfPlayers >= 2 )
-                        newPlayer.spectator = true;
-                    else
-                        numberOfPlayers++;
-                }
-                for (ServerPlayerData player : players) {
-                    if (player.name.equals(newPlayer.name))
-                        newPlayer.name += "!";
-                }
-                output.writeUTF(gson.toJson(newPlayer));
-                
-
-                BlockingQueue<Message> queue = new LinkedBlockingQueue<>();
-                playerMessageQueues.add(queue);
+                ServerPlayerInfo newPlayer = new ServerPlayerInfo(socket.hashCode(), socket);
                 players.add(newPlayer);
-                new Thread(new PlayerReciever(newPlayer, input, socket)).start();
-                new Thread(new PlayerMessager(newPlayer, socket, output, queue)).start();
+                new Thread(new PlayerReciever(newPlayer)).start();
+                new Thread(new PlayerMessager(newPlayer)).start();
 
 
-                System.out.println(newPlayer.name + " has joined as a " + (newPlayer.spectator ? "spectator." : "player."));
-                sendToAll(MessageTypes.SERVER_MESSAGE, newPlayer.name + " has joined as a " + (newPlayer.spectator ? "spectator." : "player."));
+                System.out.println(newPlayer.getUserName() + " has joined.");
+                sendToAll(MessageTypes.SERVER_MESSAGE, newPlayer.getUserName() + " has joined.");
             }
 
         }
@@ -89,37 +92,26 @@ public class GameServer implements Runnable {
     class PlayerReciever implements Runnable {
         private final Socket playerSocket;
         private final DataInputStream input;
-        private final ServerPlayerData data;
+        private final ServerPlayerInfo data;
 
-        public PlayerReciever(ServerPlayerData data, DataInputStream input, Socket playerSocket) {
+        public PlayerReciever(ServerPlayerInfo data) {
             this.data = data;
-            this.input = input;
-            this.playerSocket = playerSocket;
+            this.input = data.getInput();
+            this.playerSocket = data.getConnectionSocket();
         }
 
         @Override
         public void run() {
             try {
-
                 while (!playerSocket.isClosed()) {
                     int messageType = input.readInt();
-
-                    switch(messageType) {
-                        case MessageTypes.TEXT: {
-                            String s = gson.fromJson(input.readUTF(), String.class);
-                            sendToAll( MessageTypes.TEXT, data.name + ": " + s );
-                            System.out.println(s);
-                            break;
-                        }
-                        default: {
-                            throw new RuntimeException("Invalid message of type '" + messageType + "'");
-                        }
-                    }
+                    handleMessage(messageType, input.readUTF(), data);
                 }
             }
             catch (EOFException | SocketException e) {
                 // Connection lost, nothing to worry about.
-                sendToAll(MessageTypes.SERVER_MESSAGE, data.name + " has disconnected.");
+                System.out.println(data.getUserName() + " has disconnected.");
+                sendToAll(MessageTypes.SERVER_MESSAGE, data.getUserName() + " has disconnected.");
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -128,22 +120,22 @@ public class GameServer implements Runnable {
 
     class PlayerMessager implements Runnable {
         private final Socket playerSocket;
-        private final ServerPlayerData data;
+        private final ServerPlayerInfo data;
         private final DataOutputStream output;
         private final BlockingQueue<Message> queue;
 
-        public PlayerMessager(ServerPlayerData data, Socket playerSocket, DataOutputStream output, BlockingQueue<Message> queue) {
+        public PlayerMessager(ServerPlayerInfo data) {
             this.data = data;
-            this.playerSocket = playerSocket;
-            this.output = output;
-            this.queue = queue;
+            this.playerSocket = data.getConnectionSocket();
+            this.output = data.getOutput();
+            this.queue = data.getMessageQueue();
         }
 
         @Override
         public void run() {
             try {
                 while (!playerSocket.isClosed()) {
-                    Message sendingMessage = queue.take();
+                    Message sendingMessage = data.getMessageQueue().take();
 
                     output.writeInt(sendingMessage.getMessageType());
                     output.writeUTF(sendingMessage.getGsonObject());
@@ -158,7 +150,6 @@ public class GameServer implements Runnable {
             }
             finally {
                 players.remove(data);
-                playerMessageQueues.remove(queue);
             }
         }
     }

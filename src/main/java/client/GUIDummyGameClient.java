@@ -3,8 +3,7 @@ package client;
 import com.google.gson.Gson;
 import javafx.application.Platform;
 import server.MessageTypes;
-import server.ServerPlayerData;
-import javafx.animation.AnimationTimer;
+import server.ServerPlayerInfo;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -25,10 +24,9 @@ public class GUIDummyGameClient extends Application {
     public static Gson gson = new Gson();
 
     private Socket socket;
-    private Thread thread;
     private DataOutputStream output;
     private DataInputStream input;
-    private ServerPlayerData data;
+    private ServerPlayerInfo data;
 
     void sendMessage(int messageType, Object message) throws IOException {
         output.writeInt(messageType);
@@ -44,14 +42,6 @@ public class GUIDummyGameClient extends Application {
         socket = new Socket(InetAddress.getLocalHost(), 1337);
         output = new DataOutputStream(socket.getOutputStream());
         input = new DataInputStream(socket.getInputStream());
-
-        data = new ServerPlayerData();
-        data.spectator = false;
-        data.name = "Dude";
-
-        output.writeUTF(gson.toJson(data));
-        data = gson.fromJson(input.readUTF(), ServerPlayerData.class);
-
 
         Group root = new Group();
         Scene scene = new Scene(root, 235, 335, Color.SNOW);
@@ -84,7 +74,7 @@ public class GUIDummyGameClient extends Application {
         textDisplay.setPrefWidth(235);
         root.getChildren().add(textDisplay);
 
-        thread = new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {

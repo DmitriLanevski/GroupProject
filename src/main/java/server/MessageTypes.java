@@ -6,4 +6,5 @@ package server;
 public class MessageTypes {
     public static final int TEXT = 0;
     public static final int SERVER_MESSAGE = 1;
+    public static final int LOGIN = 2;
 }
