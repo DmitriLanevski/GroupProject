@@ -1,4 +1,4 @@
-package gameLogic.Skills;
+package gameLogic.skills;
 import gameLogic.buffs.BasicAtack;
 
 import java.util.HashMap;

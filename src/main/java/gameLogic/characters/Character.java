@@ -1,9 +1,8 @@
 package gameLogic.characters;
 
 import gameLogic.attributes.Status;
-import gameLogic.attributes.StatusCollection;
 import gameLogic.buffs.Buff;
-import gameLogic.Skills.Skill;
+import gameLogic.skills.Skill;
 
 import java.util.ArrayList;
 import java.util.HashMap;

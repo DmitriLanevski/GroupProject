@@ -1,7 +1,6 @@
 package gameLogic.buffs;
 
 import gameLogic.characters.Character;
-import gameLogic.Skills.Skill;
 
 public abstract class Buff {
     public boolean isExpired = true;
