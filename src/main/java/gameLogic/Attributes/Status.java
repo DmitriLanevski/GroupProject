@@ -1,4 +1,4 @@
-package gameLogic;
+package gameLogic.attributes;
 
 public class Status {
     private double value;
@@ -7,6 +7,12 @@ public class Status {
 
     public double getValue() {
         return value;
+    }
+
+    public Status(double value, double min, double max) {
+        this.value = value;
+        this.min = min;
+        this.max = max;
     }
 
     public void setValue(double value) {
@@ -37,5 +43,9 @@ public class Status {
         this.max = max;
         if (value > max)
             value = max;
+    }
+
+    public String toString(){
+        return Double.toString(value);
     }
 }

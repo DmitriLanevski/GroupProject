@@ -55,7 +55,20 @@ public class GUIDummyGameClient extends Application {
             @Override
             public void handle(ActionEvent event) {
                 try {
-                    sendMessage(MessageTypes.TEXT, inputTextField.getText());
+                    int messageType;
+                    String messageText;
+                    String message = inputTextField.getText();
+                    System.out.println(message);
+                    if (message.contains(",")){
+                        String[] messageParts = message.split(",");
+                        messageType = Integer.parseInt(messageParts[0]);
+                        messageText = messageParts[1];
+                    }
+                    else {
+                        messageType = MessageTypes.TEXT;
+                        messageText = message;
+                    }
+                    sendMessage(messageType, messageText);
                     inputTextField.clear();
                 }
                 catch (SocketException e) {

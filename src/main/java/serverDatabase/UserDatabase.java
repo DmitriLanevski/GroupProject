@@ -1,6 +1,5 @@
 package serverDatabase;
 
-
 import org.h2.tools.RunScript;
 
 import java.io.IOException;

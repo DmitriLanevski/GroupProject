@@ -1,6 +1,7 @@
 package server;
 
 import com.google.gson.Gson;
+import gameLogic.GameEngine;
 import serverDatabase.UserDatabase;
 
 import java.io.*;
@@ -22,6 +23,7 @@ public class GameServer implements Runnable {
     private final Object messageOrderlock = new Object();
 
     private UserDatabase userDatabase;
+    private GameEngine gameEngine = new GameEngine();
 
     public GameServer(int port) throws SQLException, IOException {
         this.port = port;
@@ -54,6 +56,9 @@ public class GameServer implements Runnable {
                 } else {
                     sender.sendMessage(MessageTypes.SERVER_MESSAGE, "Failed to log in.");
                 }
+            }
+            case MessageTypes.TO_GAME_ENGINE_NEW_CHARACTER:{
+                gameEngine.createNewCharacter(sender);
             }
             default: {
                 throw new RuntimeException("Invalid message of type '" + messageType + "'");
