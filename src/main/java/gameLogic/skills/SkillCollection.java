@@ -8,10 +8,10 @@ import java.util.HashMap;
 public class SkillCollection {
     private HashMap<String, Skill> skillCollection = new HashMap<>();
 
-    public synchronized HashMap<String, Skill> load() {
+    /*public  HashMap<String, Skill> load() {
         Skill basicAtack = new Skill();
-        basicAtack.getBuffs().add(new BasicAtack());
-        skillCollection.put("BasicAttack", basicAtack);
-        return skillCollection;
-    }
+    basicAtack.getBuffs().add(new BasicAtack());
+    skillCollection.put("BasicAttack", basicAtack);
+    return skillCollection;
+}*/
 }
