@@ -11,4 +11,8 @@ public class Skill {
     public synchronized List<Buff> getBuffs() {
         return buffs;
     }
+
+    onUse
+
+    canUse
 }

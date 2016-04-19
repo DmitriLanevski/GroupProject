@@ -3,32 +3,111 @@ package gameLogic.buffs;
 import gameLogic.characters.Character;
 
 public abstract class Buff {
-    public boolean isExpired = true;
+    private boolean isExpired;
+    private String statusName;
+    private double effectValue;
+    private int durationInTicks;
+    private String skillName; //Maybe it isn't necessary, but this parameter will exist anyway within the skill and
+                              // we can track skill origins and invent some measure against or for. It can have great purpose.
+    private Character user;
+    private Character oponent;
 
-    public synchronized void onApplied(Character user, Character target, String usedSkillName) {
+    public Buff(Character user, Character oponent, String statusName, double effectValue, int durationInTicks, String skillName) {
+        this.oponent = oponent;
+        this.user = user;
+        this.statusName = statusName;
+        this.effectValue = effectValue;
+        this.durationInTicks = durationInTicks;
+        this.skillName = skillName;
+        if (durationInTicks == 0){
+            this.isExpired = false;
+        } else {this.isExpired = true;}
+    }
+
+    public void onApplied() {
 
     }
-    public synchronized void onRemoved(Character user, Character target, String usedSkillName) {
+    public void onRemoved() {
 
     }
-    public synchronized boolean isExpired() {
+    public boolean isExpired() {
         return isExpired;
     }
 
-    public synchronized void onAttack(Character user, Character target, String usedSkillName) {
+    public void onAttack() {
 
     }
-    public synchronized void onDefend(Character user, Character target, String usedSkillName) {
+    public void onDefend() {
 
     }
 
-    public synchronized void onDamageDealt(Character user, Character target, String usedSkillName, double Amount) {
+    public void onDamageDealt() {
 
     }
-    public synchronized void onDamageTaken(Character user, Character target, String usedSkillName, double Amount) {
+    public void onDamageTaken() {
     }
 
-    public synchronized void onStatusChange(Character user, Character target, String usedSkillName, String statusName, double change) {
+    public void onStatusChange() {
 
+    }
+
+    public void onTick(){
+        if (durationInTicks > 0){
+            durationInTicks--;
+        } else {
+            isExpired = true;
+        }
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public double getEffectValue() {
+        return effectValue;
+    }
+
+    public int getDurationInTicks() {
+        return durationInTicks;
+    }
+
+    public String getSkillName() {
+        return skillName;
+    }
+
+    public Character getUser() {
+        return user;
+    }
+
+    public Character getOponent() {
+        return oponent;
+    }
+
+    public void setExpired(boolean expired) {
+        isExpired = expired;
+    }
+
+    public void setStatusName(String statusName) {
+        this.statusName = statusName;
+    }
+
+    public void setEffectValue(double effectValue) {
+        this.effectValue = effectValue;
+    }
+
+    public void setDurationInTicks(int durationInTicks) {
+        this.durationInTicks = durationInTicks;
+    }
+
+    public void setSkillName(String skillName) {
+        this.skillName = skillName;
+    }
+
+    public void setUser(Character user) {
+        this.user = user;
+    }
+
+    public void setOponent(Character oponent) {
+        this.oponent = oponent;
     }
 }
