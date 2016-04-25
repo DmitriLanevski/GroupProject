@@ -1,6 +1,7 @@
 package gameLogic.skills;
 
 import gameLogic.buffs.Buff;
+import gameLogic.buffs.ClassicalBuff;
 import gameLogic.characters.Character;
 
 import java.util.ArrayList;
@@ -10,20 +11,37 @@ public class Skill {
     private List<Buff> buffs = new ArrayList<>();
 
     private Character user;
-    private Character oponent;
+    private Character opponent;
+    private int cooldownInTicks;
+    private boolean canUse = true;
 
-    public Skill(Character oponent, Character user) {
-        this.oponent = oponent;
+    public Skill(Character user, Character opponent, int cooldownInTicks) {
         this.user = user;
+        this.opponent = opponent;
+        this.cooldownInTicks = cooldownInTicks;
     }
 
-    public List<Buff> getBuffs() {
-        this.user.applyBuffs(BuffMethodsTypes.ON_APPLIED);
-        return buffs;
+    public void use(Character user, Character opponent){
+        for (Buff buff : buffs) {
+
+        }
     }
 
+    public boolean canUse(){
+        return canUse;
+    }
 
-    //onUse
+    public void onTick(){
+        if (cooldownInTicks > 0){
+            cooldownInTicks--;
+        } else {
+            canUse = true;
+        }
+    }
 
-    //canUse
+    public void linkBuff(){
+        Buff buff = new ClassicalBuff(user, opponent);
+        buffs.add() {
+        })
+    }
 }

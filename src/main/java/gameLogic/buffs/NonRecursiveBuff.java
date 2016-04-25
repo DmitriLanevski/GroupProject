@@ -8,8 +8,9 @@ import gameLogic.characters.Character;
 public class NonRecursiveBuff extends Buff {
     private boolean recursiveLock = false;
 
-    public NonRecursiveBuff(Character user, Character oponent, String statusName, double effectValue, int durationInTicks, String skillName) {
-        super(user, oponent, statusName, effectValue, durationInTicks, skillName);
+    public NonRecursiveBuff(Character user, Character opponent, boolean recursiveLock) {
+        super(user, opponent);
+        this.recursiveLock = recursiveLock;
     }
 
     @Override

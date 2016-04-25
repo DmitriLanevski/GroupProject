@@ -14,8 +14,8 @@ public class ClassicalBuff extends Buff{
     // we can track skill origins and invent some measure against or for. It can have great purpose.
 
 
-    public ClassicalBuff(Character user, Character oponent, boolean isExpired, String statusName, double effectValue, int durationInTicks, String skillName) {
-        super(user, oponent);
+    public ClassicalBuff(Character user, Character opponent, boolean isExpired, String statusName, double effectValue, int durationInTicks, String skillName) {
+        super(user, opponent);
         if (durationInTicks == 0){
             this.isExpired = false;
         } else {this.isExpired = true;}
@@ -23,6 +23,16 @@ public class ClassicalBuff extends Buff{
         this.effectValue = effectValue;
         this.durationInTicks = durationInTicks;
         this.skillName = skillName;
+    }
+
+    @Override
+    public void onApplied(){
+
+    }
+
+    @Override
+    public boolean isExpired(){
+        return isExpired;
     }
 
     @Override

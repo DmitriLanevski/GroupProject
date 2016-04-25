@@ -7,9 +7,9 @@ public abstract class Buff {
     private Character user;
     private Character oponent;
 
-    public Buff(Character user, Character oponent) {
+    public Buff(Character user, Character opponent) {
         this.user = user;
-        this.oponent = oponent;
+        this.oponent = opponent;
     }
 
     public void onApplied() {
@@ -19,7 +19,7 @@ public abstract class Buff {
 
     }
     public boolean isExpired() {
-
+        return true;
     }
 
     public void onAttack() {
