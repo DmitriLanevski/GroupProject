@@ -40,30 +40,13 @@ public class Character {
         status.get(statusName).changeValueBy(amount);
     }
 
-    //This method can be simply described in Skills
-    public void eventChangeStatus(String statusName, double amount, String methodName){
+    void eventChangeStatusBy(String statusName, double amount) {
         changeStatus(statusName, amount);
-        applyBuffs(methodName);
+        activeBuffs.forEach((Buff buff)->buff.onStatusChange(amount));
     }
 
-    //This method can be simply described in Skills
-    public void eventSharedChangeStatus(String statusName, double amount, String userMethodName, Character oponent, String oponentMethodName){
-        changeStatus(statusName, amount);
-        applyBuffs(userMethodName);
-        oponent.applyBuffs(oponentMethodName);
-    }
-
-    public void applyBuffs(String usingSpecificMethod){
-        String methodName = usingSpecificMethod;
-        activeBuffs.forEach((Buff buff)->{
-            try {
-                Method method = buff.getClass().getMethod(methodName);
-                method.invoke(buff);
-            } catch (SecurityException e) { throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) { throw new RuntimeException(e);
-            } catch (IllegalArgumentException e) { throw new RuntimeException(e);
-            } catch (IllegalAccessException e) { throw new RuntimeException(e);
-            } catch (InvocationTargetException e) { throw new RuntimeException(e); }
-        });
+    void eventDealDamage(double amount) {
+        changeStatus("Health", amount);
+        activeBuffs.forEach((Buff buff)->buff.onDamageTaken(amount));
     }
 }

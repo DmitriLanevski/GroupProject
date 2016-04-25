@@ -1,7 +1,6 @@
 package gameLogic.skills;
 
 import gameLogic.buffs.Buff;
-import gameLogic.buffs.BuffMethodsTypes;
 import gameLogic.characters.Character;
 
 import java.util.ArrayList;
