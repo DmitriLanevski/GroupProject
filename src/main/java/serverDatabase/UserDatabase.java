@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,6 +17,14 @@ import java.util.Map;
 public class UserDatabase implements AutoCloseable {
 
     private final Connection conn;
+
+    //TODO: add stat data + skill data
+    public CharacterData loginGetChars(int charID) throws Exception {
+        List<Integer> charSkills = showCharSkills(charID);
+        Map<String,Long> charStats = showAllStats(charID);
+        CharacterData theChar = new CharacterData(charID,charSkills,charStats);
+        return theChar;
+    }
 
     public UserDatabase() throws SQLException, IOException {
         conn = DriverManager.getConnection("jdbc:h2:./Database");
@@ -28,13 +38,13 @@ public class UserDatabase implements AutoCloseable {
 
     public static void main(String[] args) throws Exception {
         UserDatabase database = new UserDatabase();
-        System.out.println("checkUserExistence:"+ database.checkUserExistence("Alpha"));
-        System.out.println("registerUser:"+database.registerUser("Alpha","12345"));
-        System.out.println("Password Change:"+database.changePassword("Alpha","12345"));
-        System.out.println("checkUserExistence:"+ database.checkUserExistence("Alpha"));
-        System.out.println("logIn:"+database.logIn("Alpha","12345"));
-        database.dumpTable();
-        database.close();
+        //System.out.println("checkUserExistence:"+ database.checkUserExistence("Alpha"));
+        System.out.println("registerUser:"+database.registerUser("Admin",Encryption.Encrypt("GrandAdmin")));
+        //System.out.println("Password Change:"+database.changePassword("Alpha","12345"));
+        //System.out.println("checkUserExistence:"+ database.checkUserExistence("Alpha"));
+        //System.out.println("logIn:"+database.logIn("Alpha","12345"));
+        //database.dumpTable();
+        //database.close();
     }
     public boolean checkUserExistence(String username) throws SQLException {
         String checkCommand = "SELECT LoginName FROM UserDatabase WHERE " +
@@ -50,7 +60,7 @@ public class UserDatabase implements AutoCloseable {
             String addUser = "INSERT INTO UserDatabase(LoginName,Password) VALUES (?,?);";
             PreparedStatement statement = conn.prepareStatement(addUser);
             statement.setString(1,username);
-            statement.setString(2,Encryption.Encrypt(password));
+            statement.setString(2,password);
             statement.execute();
             return true;
         }
@@ -60,7 +70,7 @@ public class UserDatabase implements AutoCloseable {
         if (checkUserExistence(username)) {
             String addUser = "UPDATE UserDatabase SET password=? WHERE loginName=?;";
             PreparedStatement statement = conn.prepareStatement(addUser);
-            statement.setString(1,Encryption.Encrypt(password));
+            statement.setString(1,password);
             statement.setString(2,username);
             statement.execute();
             return true;
@@ -106,6 +116,18 @@ public class UserDatabase implements AutoCloseable {
             theUltimateString.put(CharName, CharEXP);
         }
         return theUltimateString;
+    }
+    public List<Integer> showCharSkills(int CharID) throws SQLException {
+        List<Integer> skillsOfCharN = new ArrayList<>();
+        String allCharSkills = "SELECT SkillID FROM SkillAssign WHERE CharID = ?";
+        PreparedStatement stmt = conn.prepareStatement(allCharSkills);
+        stmt.setInt(1,CharID);
+        ResultSet rs = stmt.executeQuery(allCharSkills);
+        while (rs.next()) {
+            Integer SkillName = rs.getInt("SkillName");
+            skillsOfCharN.add(SkillName);
+        }
+        return skillsOfCharN;
     }
 
     public boolean addStat(int charID, String[] statNames, int[] statValues) throws SQLException {
@@ -155,9 +177,8 @@ public class UserDatabase implements AutoCloseable {
     public Map<String,Integer> showExistingChars(String userName) throws SQLException {
         Map<String,Integer> theUltimateString = new HashMap<>();
         if (checkUserExistence(userName)) {
-            Statement stmt = null;
             String allChars = "SELECT CharacterName,CharacterEXP FROM CharacterDatabase WHERE LoginName = ?";
-            stmt = conn.createStatement();
+            Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(allChars);
             while (rs.next()) {
                 String CharName = rs.getString("CharacterName");
@@ -169,28 +190,46 @@ public class UserDatabase implements AutoCloseable {
         return theUltimateString;
     }
 
-    public boolean checkSkillExistence(String skillName) throws SQLException {
-        String checkCommand = "SELECT SkillID FROM Skills WHERE " +
-                "SkillName = ?;";
+    public boolean checkSkillExistence(int skillID) throws SQLException {
+        String checkCommand = "SELECT SkillName FROM Skills WHERE " +
+                "SkillID = ?;";
         PreparedStatement statement = conn.prepareStatement(checkCommand);
-        statement.setString(1,skillName);
+        statement.setInt(1,skillID);
         ResultSet rs =statement.executeQuery();
         while (rs.next()) return true;
         return false;
     }
 
-    public void assignSkill(int charID, int[] skillIDs) throws SQLException {
+    public boolean assignSkill(int charID, int[] skillIDs) throws SQLException {
         String checkCommand = "DELETE FROM SkillAssign WHERE CharacterID = ?;";
         PreparedStatement statement = conn.prepareStatement(checkCommand);
         statement.setInt(1,charID);
         statement.executeQuery();
         for (int i = 0; i<skillIDs.length; i++) {
-            checkCommand = "INSERT INTO SkillAssign(CharacterID,SkillID) VALUES (?,?);";
-            statement = conn.prepareStatement(checkCommand);
-            statement.setInt(1,charID);
-            statement.setInt(2,skillIDs[i]);
-            statement.executeQuery();
+            if(checkSkillExistence(skillIDs[i])) {
+                checkCommand = "INSERT INTO SkillAssign(CharacterID,SkillID) VALUES (?,?);";
+                statement = conn.prepareStatement(checkCommand);
+                statement.setInt(1, charID);
+                statement.setInt(2, skillIDs[i]);
+                statement.executeQuery();
+            }
+            else return false;
         }
+        return true;
+    }
+    //TODO
+    public Map<String,Long> showAllStats (int charID) throws SQLException {
+        String theCommand = "SELECT StatName,StatValue FROM CharData WHERE CharacterID = ?";
+        PreparedStatement statement = conn.prepareStatement(theCommand);
+        statement.setInt(1,charID);
+        ResultSet rs =statement.executeQuery();
+        Map<String,Long> statList = new HashMap<>();
+        while (rs.next()) {
+            String statName = rs.getString("StatName");
+            Long skillID = rs.getLong("StatValue");
+            statList.put(statName,skillID);
+        }
+        return statList;
     }
 
 

@@ -15,9 +15,9 @@ CREATE TABLE IF NOT EXISTS CharacterDatabase (
    CharacterEXP INT
 );
 CREATE TABLE IF NOT EXISTS CharData (
-    CharacterId INT NOT NULL,
+    CharacterId BIGINT NOT NULL,
        StatName VARCHAR(50) NOT NULL,
-      StatValue INT NOT NULL,
+      StatValue BIGINT NOT NULL,
 );
 CREATE TABLE IF NOT EXISTS Skills (
         SkillID INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
@@ -32,4 +32,3 @@ ALTER TABLE CharacterDatabase ADD FOREIGN KEY (LoginName) REFERENCES UserDatabas
 ALTER TABLE SkillAssign ADD FOREIGN KEY (SkillID) REFERENCES Skills(SkillID);
 ALTER TABLE SkillAssign ADD FOREIGN KEY (CharacterId) REFERENCES CharacterDatabase(CharacterId);
 ALTER TABLE CharData ADD FOREIGN KEY (CharacterId) REFERENCES CharacterDatabase(CharacterId);
---INSERT INTO UserDatabase(LoginName, Password) VALUES ('Alpha','12345');
