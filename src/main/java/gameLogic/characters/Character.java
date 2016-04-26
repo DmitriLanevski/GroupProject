@@ -42,7 +42,7 @@ public class Character {
 
     void eventChangeStatusBy(String statusName, double amount) {
         changeStatus(statusName, amount);
-        activeBuffs.forEach((Buff buff)->buff.onStatusChange(amount));
+        activeBuffs.forEach((Buff buff)->buff.onStatusChange(statusName, amount));
     }
 
     void eventDealDamage(double amount) {

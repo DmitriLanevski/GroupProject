@@ -6,22 +6,34 @@ import gameLogic.characters.Character;
  * Created by lanev_000 on 20.04.2016.
  */
 public class NonRecursiveBuff extends Buff {
-    private boolean recursiveLock = false;
+    private boolean recursionLock = false;
 
-    public NonRecursiveBuff(Character user, Character opponent, boolean recursiveLock) {
+    public NonRecursiveBuff(Character user, Character opponent) {
         super(user, opponent);
-        this.recursiveLock = recursiveLock;
+    }
+
+    // Done this way so someone doesn't accidentally overwrite the lock. If lock is unneccessary, just use Buff instead.
+    @Override
+    final public void onDamageTaken(double amount) {
+        if (recursionLock) return;
+        recursionLock = true;
+        onDamageTakenBody(amount);
+        recursionLock = false;
+    }
+
+    private void onDamageTakenBody(double amount) {
+
     }
 
     @Override
-    final public void onDamageTaken(double amount) {
-        if (recursiveLock) return;
-        recursiveLock = true;
-        onDamageTakenBody();
-        recursiveLock = false;
+    final public void onStatusChange(String statusName, double amount) {
+        if (recursionLock) return;
+        recursionLock = true;
+        onStatusChangeBody(statusName, amount);
+        recursionLock = false;
     }
 
-    private void onDamageTakenBody(){
+    private void onStatusChangeBody(String statusName, double amount) {
 
     }
 }

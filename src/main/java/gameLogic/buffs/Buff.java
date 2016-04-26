@@ -5,11 +5,11 @@ import gameLogic.characters.Character;
 public abstract class Buff {
 
     private Character user;
-    private Character oponent;
+    private Character opponent;
 
     public Buff(Character user, Character opponent) {
         this.user = user;
-        this.oponent = opponent;
+        this.opponent = opponent;
     }
 
     public void onApplied() {
@@ -32,7 +32,7 @@ public abstract class Buff {
     public void onDamageTaken(double amount) {
     }
 
-    public void onStatusChange(double amount) {
+    public void onStatusChange(String statusName, double amount) {
 
     }
 
@@ -43,15 +43,15 @@ public abstract class Buff {
         return user;
     }
 
-    public Character getOponent() {
-        return oponent;
+    public Character getOpponent() {
+        return opponent;
     }
 
     public void setUser(Character user) {
         this.user = user;
     }
 
-    public void setOponent(Character oponent) {
-        this.oponent = oponent;
+    public void setOpponent(Character opponent) {
+        this.opponent = opponent;
     }
 }
