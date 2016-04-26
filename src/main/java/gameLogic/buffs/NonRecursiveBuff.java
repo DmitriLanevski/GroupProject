@@ -3,7 +3,7 @@ package gameLogic.buffs;
 import gameLogic.characters.Character;
 
 /**
- * Created by lanev_000 on 20.04.2016.
+ * Buff that cannot recursively call itself in an infinite loop.
  */
 public class NonRecursiveBuff extends Buff {
     private boolean recursionLock = false;
