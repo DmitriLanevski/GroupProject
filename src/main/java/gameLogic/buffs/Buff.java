@@ -6,10 +6,19 @@ public abstract class Buff {
 
     private Character user;
     private Character opponent;
+    protected int durationInTicks;
+    protected int timePassedInTicks = 0;
 
-    public Buff(Character user, Character opponent) {
+    /**
+     * Creates new buff.
+     * @param user The character the buff will be applied to.
+     * @param opponent The opponent of the buffed character.
+     * @param durationInTicks Duration of the buff. -1 indicates a permanent buff.
+     */
+    public Buff(Character user, Character opponent, int durationInTicks) {
         this.user = user;
         this.opponent = opponent;
+        this.durationInTicks = durationInTicks;
     }
 
     /**
@@ -30,7 +39,8 @@ public abstract class Buff {
      * @return A boolean indicating if the buff should be removed from the list of active buffs.
      */
     public boolean isExpired() {
-        return true;
+        if (durationInTicks == -1) return true;
+        else return timePassedInTicks < durationInTicks;
     }
 
     /**
@@ -67,6 +77,7 @@ public abstract class Buff {
      * Called each time tick.
      */
     public void onTick(){
+        timePassedInTicks++;
     }
 
     public Character getUser() {
@@ -83,5 +94,18 @@ public abstract class Buff {
 
     public void setOpponent(Character opponent) {
         this.opponent = opponent;
+    }
+
+    public int getDurationInTicks() {
+        return durationInTicks;
+    }
+
+    public int getTimePassedInTicks() {
+        return timePassedInTicks;
+    }
+
+    public int getTicksLeft() {
+        if (durationInTicks == -1) return -1;
+        return durationInTicks-timePassedInTicks;
     }
 }
