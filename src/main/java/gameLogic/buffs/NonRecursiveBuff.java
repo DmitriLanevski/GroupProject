@@ -21,7 +21,7 @@ public class NonRecursiveBuff extends Buff {
         recursionLock = false;
     }
 
-    private void onDamageTakenBody(double amount) {
+    protected void onDamageTakenBody(double amount) {
 
     }
 
@@ -33,7 +33,7 @@ public class NonRecursiveBuff extends Buff {
         recursionLock = false;
     }
 
-    private void onStatusChangeBody(String statusName, double amount) {
+    protected void onStatusChangeBody(String statusName, double amount) {
 
     }
 }

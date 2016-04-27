@@ -17,11 +17,11 @@ public class SimpleStatBuff extends Buff {
 
     @Override
     public void onApplied() {
-        getUser().changeStatus(statusName, amount);
+        getUser().eventChangeStatusBy(statusName, amount);
     }
 
     @Override
     public void onRemoved() {
-        getUser().changeStatus(statusName, -amount);
+        getUser().eventChangeStatusBy(statusName, -amount);
     }
 }

@@ -40,12 +40,12 @@ public class Character {
         return status.get(statusName).changeValueBy(amount);
     }
 
-    void eventChangeStatusBy(String statusName, double amount) {
+    public void eventChangeStatusBy(String statusName, double amount) {
         double change = changeStatus(statusName, amount);
         activeBuffs.forEach((Buff buff)->buff.onStatusChange(statusName, change));
     }
 
-    void eventDealDamage(double amount) {
+    public void eventDealDamage(double amount) {
         changeStatus("Health", amount);
         activeBuffs.forEach((Buff buff)->buff.onDamageTaken(amount));
     }
