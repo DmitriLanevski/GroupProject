@@ -39,8 +39,8 @@ public abstract class Buff {
      * @return A boolean indicating if the buff should be removed from the list of active buffs.
      */
     public boolean isExpired() {
-        if (durationInTicks == -1) return true;
-        else return timePassedInTicks < durationInTicks;
+        if (durationInTicks == -1) return false;
+        else return timePassedInTicks >= durationInTicks;
     }
 
     /**
