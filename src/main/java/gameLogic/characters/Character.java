@@ -36,13 +36,13 @@ public class Character {
         });
     }
 
-    public void changeStatus(String statusName, double amount){
-        status.get(statusName).changeValueBy(amount);
+    public double changeStatus(String statusName, double amount) {
+        return status.get(statusName).changeValueBy(amount);
     }
 
     void eventChangeStatusBy(String statusName, double amount) {
-        changeStatus(statusName, amount);
-        activeBuffs.forEach((Buff buff)->buff.onStatusChange(statusName, amount));
+        double change = changeStatus(statusName, amount);
+        activeBuffs.forEach((Buff buff)->buff.onStatusChange(statusName, change));
     }
 
     void eventDealDamage(double amount) {

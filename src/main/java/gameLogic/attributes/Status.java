@@ -15,10 +15,19 @@ public class Status {
         this.max = max;
     }
 
+    /**
+     * Sets the value of the stat, clamped by the minimum and maximum values.
+     * @param value The amount to set the stat to.
+     */
     public void setValue(double value) {
         this.value = Math.max(min, Math.min(value, max));
     }
 
+    /**
+     * Changes the value of the stat by the inputted value, clamped by the min and max of the stat.
+     * @param value The amount to change the value by.
+     * @return The amount of change. Can be less than inputted value due to clamping.
+     */
     public double changeValueBy(double value) {
         double oldValue = this.value;
         setValue(this.value += value);
