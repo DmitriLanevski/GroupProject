@@ -56,9 +56,11 @@ public class GameServer implements Runnable {
                 } else {
                     sender.sendMessage(MessageTypes.SERVER_MESSAGE, "Failed to log in.");
                 }
+                break;
             }
             case MessageTypes.TO_GAME_ENGINE_NEW_CHARACTER:{
                 gameEngine.createNewCharacter(sender);
+                break;
             }
             default: {
                 throw new RuntimeException("Invalid message of type '" + messageType + "'");
@@ -133,13 +135,11 @@ public class GameServer implements Runnable {
         private final Socket playerSocket;
         private final ServerPlayerInfo data;
         private final DataOutputStream output;
-        private final BlockingQueue<Message> queue;
 
         public PlayerMessager(ServerPlayerInfo data) {
             this.data = data;
             this.playerSocket = data.getConnectionSocket();
             this.output = data.getOutput();
-            this.queue = data.getMessageQueue();
         }
 
         @Override
