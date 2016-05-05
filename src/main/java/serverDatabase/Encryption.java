@@ -12,7 +12,7 @@ public class Encryption {
     private static byte[] salt = "J8/h(kH6fH6¤6#0L".getBytes();
 
     // Returns Password-Hash
-    public static String Encrypt (String pPassword) throws Exception {
+    public static String encrypt(String pPassword) throws Exception {
         KeySpec spec = new PBEKeySpec(pPassword.toCharArray(), salt, 65536, 128);
         SecretKeyFactory f = SecretKeyFactory.getInstance(instanceId);
         byte[] hash = f.generateSecret(spec).getEncoded();
@@ -20,9 +20,9 @@ public class Encryption {
         return enc.encodeToString(hash);
     }
 
-    public static boolean Check (String pPassword, String pHash) throws Exception {
+    public static boolean check(String pPassword, String pHash) throws Exception {
         // System.out.println("... debug:   pHash="+pHash);
-        String theHash = Encrypt(pPassword);
+        String theHash = encrypt(pPassword);
         // System.out.println("... debug: theHash="+theHash);
         if (theHash.equals(pHash)) return true;
         return false;
@@ -31,12 +31,12 @@ public class Encryption {
    public static void main(String[] args) throws Exception {
         String thePassword = "My Password To Test";
         System.out.println("Password to test: "+thePassword);
-        String theHash = Encrypt(thePassword);
+        String theHash = encrypt(thePassword);
         System.out.println("The hash to store in database: "+theHash);
         System.out.println("Result of checking of pair thePassword + theHash:");
-        if (Check(thePassword, theHash))
-            System.out.println("... function Check returns TRUE");
+        if (check(thePassword, theHash))
+            System.out.println("... function check returns TRUE");
         else
-            System.out.println("... function Check returns FALSE");
+            System.out.println("... function check returns FALSE");
     }
 }

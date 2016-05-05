@@ -39,7 +39,7 @@ public class UserDatabase implements AutoCloseable {
     public static void main(String[] args) throws Exception {
         UserDatabase database = new UserDatabase();
         //System.out.println("checkUserExistence:"+ database.checkUserExistence("Alpha"));
-        System.out.println("registerUser:"+database.registerUser("Admin",Encryption.Encrypt("GrandAdmin")));
+        System.out.println("registerUser:"+database.registerUser("Admin",Encryption.encrypt("GrandAdmin")));
         //System.out.println("Password Change:"+database.changePassword("Alpha","12345"));
         //System.out.println("checkUserExistence:"+ database.checkUserExistence("Alpha"));
         //System.out.println("logIn:"+database.logIn("Alpha","12345"));
@@ -86,7 +86,7 @@ public class UserDatabase implements AutoCloseable {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 String CharName = rs.getString("Password");
-                if (Encryption.Check(password, CharName)) return true;
+                if (Encryption.check(password, CharName)) return true;
             }
         }
         return false;
