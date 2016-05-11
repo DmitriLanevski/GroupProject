@@ -1,6 +1,5 @@
 package client.ui;
 
-import client.ClientServerConnection;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -16,7 +15,7 @@ import java.net.InetAddress;
 /**
  * Created by Madis on 10.05.2016.
  */
-public class LoginMenu extends MenuManager {
+public class LoginScreen extends UIManager {
     TextField usernameField = new TextField();
     TextField passwordField = new TextField();
     TextField IPField = new TextField();
@@ -24,7 +23,7 @@ public class LoginMenu extends MenuManager {
     Button loginButton = new Button();
     Text errorText = new Text();
 
-    public LoginMenu(MenuManager parentMenu) throws Exception {
+    public LoginScreen(UIManager parentMenu) throws Exception {
         super(parentMenu);
 
         addChild(usernameField);
@@ -77,7 +76,7 @@ public class LoginMenu extends MenuManager {
                         Platform.runLater(()->errorText.setText("Please Wait"));
                     }
                     else
-                        Platform.runLater(()->errorText.setText("Invalid IP or Port"));
+                        Platform.runLater(()->errorText.setText("Server not found"));
                 }
 
 
@@ -91,7 +90,7 @@ public class LoginMenu extends MenuManager {
     public void handleMessage(Message message) {
         switch (message.getMessageType()) {
             case MessageTypes.LOGIN_SUCCESS:
-                Platform.runLater(()->getParentMenu().activateByName("FrontPage"));
+                Platform.runLater(()-> getParentManager().activateByName("FrontPage"));
                 break;
             case MessageTypes.LOGIN_FAILURE:
                 Platform.runLater(()->errorText.setText(message.readAs(String.class)));

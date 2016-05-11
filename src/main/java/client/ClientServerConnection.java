@@ -1,6 +1,6 @@
 package client;
 
-import client.ui.MenuManager;
+import client.ui.UIManager;
 import server.Message;
 
 import java.io.DataInputStream;
@@ -18,7 +18,7 @@ public class ClientServerConnection {
     Socket socket = null;
     DataInputStream in = null;
     DataOutputStream out = null;
-    MenuManager primaryHandler = null;
+    UIManager primaryHandler = null;
     BlockingQueue<Message> messages = new LinkedBlockingQueue<>();
 
     public void sendMessage(int messageType, Object message) {
@@ -65,7 +65,7 @@ public class ClientServerConnection {
         }
     }
 
-    public void setPrimaryHandler(MenuManager primaryHandler) {
+    public void setPrimaryHandler(UIManager primaryHandler) {
         this.primaryHandler = primaryHandler;
     }
 
