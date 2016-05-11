@@ -54,7 +54,7 @@ public class GameServer implements Runnable {
                     sender.setUserName(data.userName);
                     sender.setLoggedIn(true);
                 } else {
-                    sender.sendMessage(MessageTypes.SERVER_MESSAGE, "Failed to log in.");
+                    sender.sendMessage(MessageTypes.LOGIN_FAILURE, "Invalid Username or Password");
                 }
                 break;
             }

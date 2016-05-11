@@ -2,5 +2,18 @@ package server;
 
 public class LoginData {
     String userName;
-    String password; // let's collect all the unhashed passwords!
+    String password;
+
+    public LoginData(String userName, String password) {
+        this.password = password;
+        this.userName = userName;
+    }
+
+    @Override
+    public String toString() {
+        return "LoginData{" +
+                "password='" + password + '\'' +
+                ", userName='" + userName + '\'' +
+                '}';
+    }
 }

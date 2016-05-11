@@ -40,8 +40,6 @@ public class Skill {
     }
 
     public void linkBuff(){
-        Buff buff = new ClassicalBuff(user, opponent);
-        buffs.add() {
-        })
+
     }
 }
