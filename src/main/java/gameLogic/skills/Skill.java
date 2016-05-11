@@ -38,10 +38,10 @@ public class Skill {
             canUse = true;
         }
     }
-
+/*
     public void linkBuff(){
         Buff buff = new ClassicalBuff(user, opponent);
         buffs.add() {
-        })
-    }
+        }
+    }*/
 }

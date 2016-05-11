@@ -20,11 +20,12 @@ import java.util.HashMap;
  */
 public class GameEngine {
     public Character createNewCharacter(ServerPlayerInfo data){
-
+        return null;
     }
 
     public Character loadCharacter(){
         HashMap<String, Status> status = new StatusCollection().load();
+        return  null;
     }
 
     public void upgradeCharacter(){
