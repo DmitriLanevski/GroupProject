@@ -20,7 +20,7 @@ public class UserDatabase implements AutoCloseable {
 
     //TODO: add stat data + skill data
     public CharacterData loginGetChars(int charID) throws Exception {
-        List<Integer> charSkills = showCharSkills(charID);
+        List<String> charSkills = showCharSkills(charID);
         Map<String,Long> charStats = showAllStats(charID);
         CharacterData theChar = new CharacterData(charID,charSkills,charStats);
         return theChar;
@@ -39,15 +39,12 @@ public class UserDatabase implements AutoCloseable {
     public static void main(String[] args) throws Exception {
         UserDatabase database = new UserDatabase();
         //System.out.println("checkUserExistence:"+ database.checkUserExistence("Alpha"));
-        String pw = Bcrypt.hashpw("GrandAdmin",Bcrypt.gensalt(12));
-        System.out.println("registerUser:"+database.registerUser("Admin",Bcrypt.hashpw("GrandAdmin",Bcrypt.gensalt(12))));
-        System.out.println(pw);
-        System.out.println(Bcrypt.hashpw("GrandAdmin",Bcrypt.gensalt(12)));
+        System.out.println("registerUser:"+database.registerUser("Admin",Bcrypt.hashpw("GrandAdmin",Bcrypt.gensalt())));
         //System.out.println("Password Change:"+database.changePassword("Alpha","12345"));
         //System.out.println("checkUserExistence:"+ database.checkUserExistence("Alpha"));
         //System.out.println("logIn:"+database.logIn("Alpha","12345"));
-        //database.dumpTable();
-        //database.close();
+        database.dumpTable();
+        database.close();
     }
     public boolean checkUserExistence(String username) throws SQLException {
         String checkCommand = "SELECT LoginName FROM UserDatabase WHERE " +
@@ -89,7 +86,7 @@ public class UserDatabase implements AutoCloseable {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 String thePassword = rs.getString("Password");
-                if (Bcrypt.checkpw(password, thePassword)) return true;
+                if (thePassword.equals(password)) return true;
             }
         }
         return false;
@@ -120,14 +117,14 @@ public class UserDatabase implements AutoCloseable {
         }
         return theUltimateString;
     }
-    public List<Integer> showCharSkills(int CharID) throws SQLException {
-        List<Integer> skillsOfCharN = new ArrayList<>();
-        String allCharSkills = "SELECT SkillID FROM SkillAssign WHERE CharID = ?";
+    public List<String> showCharSkills(int CharID) throws SQLException {
+        List<String> skillsOfCharN = new ArrayList<>();
+        String allCharSkills = "SELECT SkillName FROM SkillAssign WHERE CharID = ?";
         PreparedStatement stmt = conn.prepareStatement(allCharSkills);
         stmt.setInt(1,CharID);
         ResultSet rs = stmt.executeQuery(allCharSkills);
         while (rs.next()) {
-            Integer SkillName = rs.getInt("SkillName");
+            String SkillName = rs.getString("SkillName");
             skillsOfCharN.add(SkillName);
         }
         return skillsOfCharN;

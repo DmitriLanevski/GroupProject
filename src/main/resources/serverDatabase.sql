@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS Skills (
 );
 CREATE TABLE IF NOT EXISTS SkillAssign (
     CharacterId INT NOT NULL,
-        SkillID INT NOT NULL
+      SkillName VARCHAR(40) NOT NULL
 );
 ALTER TABLE CharacterDatabase ADD FOREIGN KEY (LoginName) REFERENCES UserDatabase(LoginName);
-ALTER TABLE SkillAssign ADD FOREIGN KEY (SkillID) REFERENCES Skills(SkillID);
+ALTER TABLE SkillAssign ADD FOREIGN KEY (SkillName) REFERENCES Skills(SkillName);
 ALTER TABLE SkillAssign ADD FOREIGN KEY (CharacterId) REFERENCES CharacterDatabase(CharacterId);
 ALTER TABLE CharData ADD FOREIGN KEY (CharacterId) REFERENCES CharacterDatabase(CharacterId);

@@ -10,10 +10,10 @@ import java.util.Map;
  */
 public class CharacterData{
     public int CharID;
-    public List<Integer> SkillIDs;
+    public List<String> SkillIDs;
     public Map<String,Long> StatIDs;
 
-    public CharacterData(int charID, List<Integer> skillIDs, Map<String,Long> statIDs) throws SQLException, IOException {
+    public CharacterData(int charID, List<String> skillIDs, Map<String,Long> statIDs) throws SQLException, IOException {
         CharID = charID;
         SkillIDs = skillIDs;
         StatIDs = statIDs;
