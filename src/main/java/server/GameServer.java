@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 
 public class GameServer implements Runnable {
 
@@ -55,11 +54,11 @@ public class GameServer implements Runnable {
                     sender.setLoggedIn(true);
                     sender.sendMessage(MessageTypes.LOGIN_SUCCESS, "");
                 } else {
-                    sender.sendMessage(MessageTypes.LOGIN_SUCCESS, "Invalid Username or Password"); // TEMPORARY
+                    sender.sendMessage(MessageTypes.LOGIN_FAILURE, "Invalid Username or Password");
                 }
                 break;
             }
-            case MessageTypes.TO_GAME_ENGINE_NEW_CHARACTER:{
+            case MessageTypes.NEW_CHARACTER:{
                 gameEngine.createNewCharacter(sender);
                 break;
             }

@@ -17,7 +17,7 @@ public class PrimaryUI extends UIManager {
         // TODO: ServerBrowser
         // TODO: CharacterCreator
         // TODO: CharacterSelect
-        // TODO: BattleScreen
+        addNamedManager("BattleScreen", new BattleScreen(this));
     }
 
     @Override
