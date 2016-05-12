@@ -10,5 +10,7 @@ public class MessageTypes {
     public static final int LOGIN_SUCCESS = 3;
     public static final int LOGIN_FAILURE = 4;
     public static final int TO_GAME_ENGINE_NEW_CHARACTER = 5;
+    public static final int GAME_START = 6;
 
+    public static final int CLOSE_THREAD = 10000;
 }

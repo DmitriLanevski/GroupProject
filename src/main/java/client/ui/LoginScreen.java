@@ -81,7 +81,7 @@ public class LoginScreen extends UIManager {
 
 
                 // FAKE RESPONSE
-                //handleMessage(new Message(MessageTypes.LOGIN_FAILURE, "Wrong Password"));
+                //handleMessage(new Message(MessageTypes.LOGIN_SUCCESS, "Wrong Password"));
             }
         });
     }
@@ -90,10 +90,10 @@ public class LoginScreen extends UIManager {
     public void handleMessage(Message message) {
         switch (message.getMessageType()) {
             case MessageTypes.LOGIN_SUCCESS:
-                Platform.runLater(()-> getParentManager().activateByName("FrontPage"));
+                getParentManager().activateByName("MainMenu");
                 break;
             case MessageTypes.LOGIN_FAILURE:
-                Platform.runLater(()->errorText.setText(message.readAs(String.class)));
+                errorText.setText(message.readAs(String.class));
                 break;
         }
     }
@@ -103,5 +103,6 @@ public class LoginScreen extends UIManager {
         usernameField.clear();
         passwordField.clear();
         errorText.setText("");
+        getToServer().close();
     }
 }

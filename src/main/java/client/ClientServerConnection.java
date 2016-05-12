@@ -1,7 +1,9 @@
 package client;
 
 import client.ui.UIManager;
+import javafx.application.Platform;
 import server.Message;
+import server.MessageTypes;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -27,16 +29,20 @@ public class ClientServerConnection {
     }
 
     public boolean connectToServer(String host, String port)  {
-        if (socket != null) return true;
+        if (socket != null)
+            if (!socket.isClosed())
+                return true;
         try {
             socket = new Socket(InetAddress.getByName(host), Integer.parseInt(port));
             in = new DataInputStream(socket.getInputStream());
             out = new DataOutputStream(socket.getOutputStream());
+            messages.clear();
 
             new Thread(()->{
                 try {
                     while (!socket.isClosed()) {
                         Message message = messages.take();
+                        if (message.getMessageType() == MessageTypes.CLOSE_THREAD) return;
                         out.writeInt(message.getMessageType());
                         out.writeUTF(message.getGsonObject());
                     }
@@ -71,11 +77,17 @@ public class ClientServerConnection {
 
     public void handleMessage(Message message) {
         if (primaryHandler != null) {
-            primaryHandler.handleMessage(message);
+            Platform.runLater(()->primaryHandler.handleMessage(message));
         }
     }
 
-    public void close() throws IOException {
-        if (socket != null) socket.close();
+    public void close() {
+        try {
+            if (socket != null) socket.close();
+            messages.add(new Message(MessageTypes.CLOSE_THREAD, ""));
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
