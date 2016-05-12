@@ -1,6 +1,6 @@
 package gameLogic.attributes;
 
-public class Status {
+public class Stat {
     private double value;
     private double min;
     private double max;
@@ -9,10 +9,16 @@ public class Status {
         return value;
     }
 
-    public Status(double value, double min, double max) {
+    public Stat(double value, double min, double max) {
         this.value = value;
         this.min = min;
         this.max = max;
+    }
+
+    public Stat(Stat s) {
+        this.value = s.value;
+        this.max = s.max;
+        this.min = s.min;
     }
 
     /**
@@ -52,6 +58,11 @@ public class Status {
         this.max = max;
         if (value > max)
             value = max;
+    }
+
+    public void increaseMax(double add, boolean fill) {
+        max += add;
+        value += add;
     }
 
     public String toString(){

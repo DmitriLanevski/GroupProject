@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-import gameLogic.GameEngine;
 import serverDatabase.UserDatabase;
 
 import java.io.*;
@@ -22,7 +21,6 @@ public class GameServer implements Runnable {
     private final Object messageOrderlock = new Object();
 
     private UserDatabase userDatabase;
-    private GameEngine gameEngine = new GameEngine();
 
     public GameServer(int port) throws SQLException, IOException {
         this.port = port;
@@ -59,7 +57,7 @@ public class GameServer implements Runnable {
                 break;
             }
             case MessageTypes.NEW_CHARACTER:{
-                gameEngine.createNewCharacter(sender);
+
                 break;
             }
             default: {

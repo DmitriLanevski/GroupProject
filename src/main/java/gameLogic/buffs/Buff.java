@@ -44,6 +44,20 @@ public abstract class Buff {
     }
 
     /**
+     * Called when buffed character uses a skill
+     */
+    public void onSkillUse() {
+
+    }
+
+    /**
+     * Called when the opponent uses a skill
+     */
+    public void onOpponentSkillUse() {
+
+    }
+
+    /**
      * Called when buffed character uses an attack skill.
      */
     public void onAttack() {
