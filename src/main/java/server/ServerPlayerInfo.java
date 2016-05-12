@@ -22,6 +22,8 @@ public class ServerPlayerInfo implements Serializable {
     private boolean loggedIn;
     private String userName;
 
+    private UserGameData gameData = null;
+
     public ServerPlayerInfo(int connectionID, Socket connectionSocket) throws IOException {
         this.connectionID = connectionID;
         this.connectionSocket = connectionSocket;
@@ -82,5 +84,13 @@ public class ServerPlayerInfo implements Serializable {
 
     public synchronized DataOutputStream getOutput() {
         return output;
+    }
+
+    public synchronized UserGameData getGameData() {
+        return gameData;
+    }
+
+    public synchronized void setGameData(UserGameData gameData) {
+        this.gameData = gameData;
     }
 }

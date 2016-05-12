@@ -8,7 +8,7 @@ import serverDatabase.CharacterData;
 import java.util.HashMap;
 
 public class Game {
-    static Character createCharacter(CharacterData rawData) {
+    public static Character createCharacter(CharacterData rawData) {
         HashMap<String, Integer> skills = new HashMap<>();
         HashMap<String, Stat> stats = Stats.getUniversals();
 

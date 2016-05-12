@@ -1,6 +1,9 @@
 package server;
 
 import com.google.gson.Gson;
+import gameLogic.BattleInstance;
+import gameLogic.Game;
+import serverDatabase.CharacterData;
 import serverDatabase.UserDatabase;
 
 import java.io.*;
@@ -11,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class GameServer implements Runnable {
 
@@ -19,6 +23,8 @@ public class GameServer implements Runnable {
     private final int port;
     private final List<ServerPlayerInfo> players = Collections.synchronizedList(new ArrayList<>());
     private final Object messageOrderlock = new Object();
+
+    private ServerPlayerInfo userAwaitingGame = null;
 
     private UserDatabase userDatabase;
 
@@ -47,23 +53,65 @@ public class GameServer implements Runnable {
             }
             case MessageTypes.LOGIN: {
                 LoginData data = gson.fromJson(message, LoginData.class);
-                if (verifyLogin(data.userName, data.password)) {
-                    sender.setUserName(data.userName);
-                    sender.setLoggedIn(true);
-                    sender.sendMessage(MessageTypes.LOGIN_SUCCESS, "");
-                } else {
-                    sender.sendMessage(MessageTypes.LOGIN_FAILURE, "Invalid Username or Password");
-                }
+                attemptLogin(data, sender);
                 break;
             }
-            case MessageTypes.NEW_CHARACTER:{
-
+            case MessageTypes.NEW_CHARACTER: {
+                CharacterData data = gson.fromJson(message, CharacterData.class);
+                //sender.getGameData().getCharacters().put("", data);
                 break;
+            }
+            case MessageTypes.REQUEST_CHARACTERS: {
+                sender.sendMessage(MessageTypes.REQUEST_CHARACTERS, sender.getGameData().getCharacters());
+                break;
+            }
+            case MessageTypes.REQUEST_GAME_START: {
+                attemptStartGame(sender);
+                break;
+            }
+            case MessageTypes.SKILL_USE: {
+                sender.getGameData().getActiveBattle().skillUse(sender.getGameData().getPlayerID(), gson.fromJson(message, String.class));
             }
             default: {
                 throw new RuntimeException("Invalid message of type '" + messageType + "'");
             }
         }
+    }
+
+    private void attemptLogin(LoginData data, ServerPlayerInfo user) throws Exception {
+        if (verifyLogin(data.userName, data.password)) {
+            user.setUserName(data.userName);
+            user.setLoggedIn(true);
+            user.sendMessage(MessageTypes.LOGIN_SUCCESS, "");
+
+        } else {
+            user.sendMessage(MessageTypes.LOGIN_FAILURE, "Invalid Username or Password");
+        }
+    }
+
+    private synchronized void attemptStartGame(ServerPlayerInfo player) {
+        if (player.getGameData().getChosenCharacter() == null) return;
+        if (userAwaitingGame != null) {
+            BattleInstance battle = new BattleInstance(Game.createCharacter(userAwaitingGame.getGameData().getChosenCharacter()), Game.createCharacter(player.getGameData().getChosenCharacter()));
+            userAwaitingGame.getGameData().setActiveBattle(battle);
+            player.getGameData().setActiveBattle(battle);
+
+            userAwaitingGame.getGameData().setPlayerID(0);
+            userAwaitingGame.sendMessage(MessageTypes.GAME_START, 0);
+
+            player.getGameData().setPlayerID(1);
+            player.sendMessage(MessageTypes.GAME_START, 1);
+        }
+        else
+            userAwaitingGame = player;
+    }
+
+    private void loadUserFromDatabase(ServerPlayerInfo user) throws Exception {
+        // TODO: FINISH THIS
+    }
+
+    private void saveUserToDatabase(ServerPlayerInfo user) throws Exception {
+        // TODO: FINISH THIS
     }
 
     boolean verifyLogin(String username, String password) throws Exception {
