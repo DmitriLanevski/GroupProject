@@ -8,6 +8,12 @@ public class BattleInstance {
     public BattleInstance(Character player0, Character player1) {
         players[0] = player0;
         players[1] = player1;
+
+        players[0].setOpponent(players[1]);
+        players[1].setOpponent(players[0]);
+
+        players[0].initPassives();
+        players[1].initPassives();
     }
 
     public synchronized void tick() {

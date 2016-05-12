@@ -98,4 +98,10 @@ public class Character {
         else
             return false;
     }
+
+    public void initPassives() {
+        for (String skillName : skills.keySet()) {
+            Skills.getSkillByName(skillName).onGameStart(this, opponent);
+        }
+    }
 }
