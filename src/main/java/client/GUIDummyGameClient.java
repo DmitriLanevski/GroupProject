@@ -19,7 +19,7 @@ public class GUIDummyGameClient extends Application {
     public void start(Stage primaryStage) throws Exception {
 
         Group root = new Group();
-        Scene scene = new Scene(root, 235, 335, Color.SNOW);
+        Scene scene = new Scene(root, 435, 335, Color.SNOW);
 
         UIManager rootManager = new PrimaryUI(conn);
         root.getChildren().add(rootManager.getRoot());

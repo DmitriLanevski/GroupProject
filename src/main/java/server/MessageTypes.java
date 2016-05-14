@@ -17,10 +17,11 @@ public class MessageTypes {
     public static final int GAME_START = 8;
     public static final int REQUEST_FULL_GAME_STATE = 9;
     public static final int REQUEST_ALL_SKILLS = 10;
+    public static final int REQUEST_SKILLS_ALTERABLE_STATS = 11;
 
-    public static final int CHARACTER_STATUSES = 11;
-    public static final int SKILL_STATES = 12;
-    public static final int SKILL_USE = 13;
+    public static final int CHARACTER_STATUSES = 12;
+    public static final int SKILL_STATES = 13;
+    public static final int SKILL_USE = 14;
 
     public static final int CLOSE_THREAD = 10000;
 }

@@ -12,15 +12,15 @@ public class Game {
         HashMap<String, Integer> skills = new HashMap<>();
         HashMap<String, Stat> stats = Stats.getUniversals();
 
-        for (String skillID : rawData.SkillIDs) {
+        for (String skillID : rawData.getSkillIDs()) {
             skills.put(skillID, 0);
         }
 
         // Initializes all the stored stats and adds allocated additional points.
-        for (String statID : rawData.StatIDs.keySet()) {
+        for (String statID : rawData.getStatIDs().keySet()) {
             if (!stats.containsKey(statID)) stats.put(statID, Stats.getDefaultValueOf(statID));
 
-            stats.get(statID).setMax(Stats.getGrowthRateOf(statID)*rawData.StatIDs.get(statID));
+            stats.get(statID).setMax(Stats.getGrowthRateOf(statID)*rawData.getStatIDs().get(statID));
         }
 
         return new Character(skills, stats);
