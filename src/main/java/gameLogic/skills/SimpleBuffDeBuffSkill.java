@@ -44,6 +44,6 @@ public class SimpleBuffDeBuffSkill extends Skill {
 
     @Override
     public boolean canUse(Character user, Character opponent, int ticksSinceLastUse) {
-        return user.getStatusValue(costStat) >= cost & ticksSinceLastUse >= cooldown;
+        return user.getStatusValue(costStat) >= -cost & ticksSinceLastUse >= cooldown;
     }
 }

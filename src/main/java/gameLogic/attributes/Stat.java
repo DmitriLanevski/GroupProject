@@ -66,6 +66,6 @@ public class Stat {
     }
 
     public String toString(){
-        return Double.toString(value);
+        return Double.toString(min)+"/"+Double.toString(value)+"/"+Double.toString(max);
     }
 }

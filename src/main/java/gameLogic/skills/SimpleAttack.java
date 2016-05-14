@@ -23,7 +23,7 @@ public class SimpleAttack extends Skill {
 
     @Override
     public boolean canUse(Character user, Character opponent, int ticksSinceLastUse) {
-        return user.getStatusValue(stat) >= cost & ticksSinceLastUse >= cooldown;
+        return user.getStatusValue(stat) >= -cost & ticksSinceLastUse >= cooldown;
     }
 
     @Override
