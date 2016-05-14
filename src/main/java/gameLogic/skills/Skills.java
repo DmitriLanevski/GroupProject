@@ -7,8 +7,8 @@ public class Skills {
     static private HashMap<String, String> skillDescriptions = new HashMap<>();
 
     static {
-        addSkill("Ferocious Strike","", new SimpleAttack(10, 20, -10, "Stamina"));
-        addSkill("Berserker Strike","", new SimpleAttack(10, 50, -10, "Health"));
+        addSkill("Ferocious Strike","PLACEHOLDER_DESC", new SimpleAttack(10, 20, -10, "Stamina"));
+        addSkill("Berserker Strike","PLACEHOLDER_DESC", new SimpleAttack(10, 50, -10, "Health"));
 
     }
 
