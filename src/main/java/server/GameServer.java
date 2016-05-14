@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import gameLogic.BattleInstance;
 import gameLogic.Game;
+import gameLogic.skills.Skills;
 import serverDatabase.CharacterData;
 import serverDatabase.UserDatabase;
 
@@ -69,8 +70,13 @@ public class GameServer implements Runnable {
                 attemptStartGame(sender);
                 break;
             }
+            case MessageTypes.REQUEST_ALL_SKILLS: {
+                sender.sendMessage(MessageTypes.REQUEST_ALL_SKILLS, Skills.getAllSkillDescriptions());
+                break;
+            }
             case MessageTypes.SKILL_USE: {
                 sender.getGameData().getActiveBattle().skillUse(sender.getGameData().getPlayerID(), gson.fromJson(message, String.class));
+                break;
             }
             default: {
                 throw new RuntimeException("Invalid message of type '" + messageType + "'");

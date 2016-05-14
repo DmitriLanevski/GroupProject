@@ -15,7 +15,7 @@ public class PrimaryUI extends UIManager {
         addNamedManager("Login", new LoginScreen(this));
         addNamedManager("MainMenu", new MainMenu(this));
         // TODO: ServerBrowser
-        // TODO: CharacterCreator
+        addNamedManager("CharacterCreator", new CharacterCreateScreen(this));
         // TODO: CharacterSelect
         addNamedManager("BattleScreen", new BattleScreen(this));
     }
