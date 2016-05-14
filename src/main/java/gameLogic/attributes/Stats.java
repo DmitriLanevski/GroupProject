@@ -8,11 +8,12 @@ public class Stats {
     private static HashMap<String, Double> growthRate = new HashMap<>();
 
     static {
-
-
         everyoneHas("Health");
         everyoneHas("Stamina");
         everyoneHas("Mana");
+        everyoneHas("Strength");
+        everyoneHas("Defence");
+        everyoneHas("Intelligence");
     }
 
     private static void everyoneHas(String statName) {
@@ -20,12 +21,10 @@ public class Stats {
     }
 
     public static Stat getDefaultValueOf(String statName) {
-
         if (defaultValues.containsKey(statName))
             return new Stat(defaultValues.get(statName));
         else
             return new Stat(100, 0, 100);
-
     }
 
     public static double getGrowthRateOf(String statName) {

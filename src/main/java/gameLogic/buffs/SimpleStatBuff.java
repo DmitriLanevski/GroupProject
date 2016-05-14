@@ -8,20 +8,39 @@ import gameLogic.characters.Character;
 public class SimpleStatBuff extends Buff {
     private String statusName;
     private double amount;
+    private boolean isSelf;
 
-    public SimpleStatBuff(Character user, Character opponent, int durationInTicks, double amount, String statusName) {
+    public SimpleStatBuff(Character user, Character opponent, int durationInTicks, double amount, String statusName, boolean isSelf) {
         super(user, opponent, durationInTicks);
         this.amount = amount;
         this.statusName = statusName;
+        this.isSelf = isSelf;
     }
 
     @Override
     public void onApplied() {
-        getUser().eventChangeStatusBy(statusName, amount);
+        if (isSelf){
+            getUser().eventChangeStatusBy(statusName, amount);
+        }
+        else {
+            getOpponent().eventChangeStatusBy(statusName, amount);
+        }
     }
 
     @Override
     public void onRemoved() {
-        getUser().eventChangeStatusBy(statusName, -amount);
+        if (isSelf){
+            getUser().eventChangeStatusBy(statusName, -amount);
+        } else {
+            getOpponent().eventChangeStatusBy(statusName, -amount);
+        }
+    }
+
+    public String getStatusName() {
+        return statusName;
+    }
+
+    public double getAmount() {
+        return amount;
     }
 }
