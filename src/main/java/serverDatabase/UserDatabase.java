@@ -86,7 +86,7 @@ public class UserDatabase implements AutoCloseable {
             ResultSet rs = statement.executeQuery();
             while (rs.next()) {
                 String thePassword = rs.getString("Password");
-                if (thePassword.equals(password)) return true;
+                if (Bcrypt.checkpw(password,thePassword)) return true;
             }
         }
         return false;
