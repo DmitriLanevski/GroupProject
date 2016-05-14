@@ -59,7 +59,8 @@ public class GameServer implements Runnable {
             }
             case MessageTypes.NEW_CHARACTER: {
                 CharacterData data = gson.fromJson(message, CharacterData.class);
-                //sender.getGameData().getCharacters().put("", data);
+                sender.getGameData().getCharacters().put(data.getCharName(), data);
+                sender.sendMessage(MessageTypes.CHARACTER_CREATE_SUCCESS, "");
                 break;
             }
             case MessageTypes.REQUEST_CHARACTERS: {
@@ -103,6 +104,7 @@ public class GameServer implements Runnable {
         if (verifyLogin(data.userName, data.password)) {
             user.setUserName(data.userName);
             user.setLoggedIn(true);
+            loadUserFromDatabase(user);
             user.sendMessage(MessageTypes.LOGIN_SUCCESS, "");
 
         } else {
@@ -128,7 +130,12 @@ public class GameServer implements Runnable {
     }
 
     private void loadUserFromDatabase(ServerPlayerInfo user) throws Exception {
-        // TODO: FINISH THIS
+        List<CharacterData> characters = userDatabase.getAllChars(user.getUserName());
+        Map<String, CharacterData> characterDataMap = new HashMap<>();
+        for (CharacterData character : characters) {
+            characterDataMap.put(character.getCharName(), character);
+        }
+        user.setGameData(new UserGameData(characterDataMap));
     }
 
     private void saveUserToDatabase(ServerPlayerInfo user) throws Exception {

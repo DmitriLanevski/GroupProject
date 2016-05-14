@@ -13,6 +13,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import server.Message;
 import server.MessageTypes;
+import serverDatabase.CharacterData;
 
 import java.util.*;
 
@@ -20,6 +21,8 @@ import java.util.*;
  * Created by Madis on 14.05.2016.
  */
 public class CharacterCreateScreen extends UIManager {
+    TextField nameField = new TextField();
+
     HashMap<String, Button> skillButtons = new HashMap<>();
     VBox skillList = new VBox();
     VBox chosenSkillList = new VBox();
@@ -31,15 +34,35 @@ public class CharacterCreateScreen extends UIManager {
     public CharacterCreateScreen(UIManager parentManager) {
         super(parentManager);
 
+        addChild(nameField);
         addChild(skillList);
         addChild(chosenSkillList);
         addChild(statsList);
 
-        chosenSkillList.setLayoutX(100);
+        skillList.setLayoutX(150);
+        chosenSkillList.setLayoutX(270);
+        statsList.setLayoutX(400);
 
-        statsList.setLayoutX(200);
+        Button cancelButton = new Button("Cancel");
+        addChild(cancelButton);
+        cancelButton.setLayoutY(100);
+        cancelButton.setOnAction((e)->Platform.runLater(()->activateByName("MainMenu")));
 
-        statsList.getChildren().add(new StatButtons("Health", 100, 10));
+        Button acceptButton = new Button("Create");
+        addChild(acceptButton);
+        acceptButton.setLayoutY(100);
+        acceptButton.setLayoutX(80);
+
+        acceptButton.setOnAction((e)->Platform.runLater(this::createdCharacter));
+    }
+
+    private void createdCharacter() {
+        Map<String, Long> stats = new HashMap<>();
+        for (String statName : statButtons.keySet()) {
+            stats.put(statName, (long)statButtons.get(statName).getSpentPoints());
+        }
+        CharacterData data = new CharacterData(-1, nameField.getText(), chosenSkills, stats);
+        getToServer().sendMessage(MessageTypes.NEW_CHARACTER, data);
     }
 
     private void pressedSkill(String skillName) {
@@ -104,6 +127,9 @@ public class CharacterCreateScreen extends UIManager {
                 }
 
                 break;
+            }
+            case MessageTypes.CHARACTER_CREATE_SUCCESS: {
+                activateByName("MainMenu");
             }
         }
     }
