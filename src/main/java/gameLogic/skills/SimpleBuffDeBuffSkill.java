@@ -4,6 +4,7 @@ import gameLogic.buffs.SimpleStatBuff;
 import gameLogic.characters.Character;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,7 +39,7 @@ public class SimpleBuffDeBuffSkill extends Skill {
 
     @Override
     public List<String> requiredStats() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

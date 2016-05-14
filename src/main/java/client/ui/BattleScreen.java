@@ -128,11 +128,12 @@ public class BattleScreen extends UIManager {
         public StatDisplay(String name, Stat stat) {
             getChildren().add(new Text(name));
             getChildren().add(disp);
+            getChildren().add(dispText);
             update(stat);
         }
 
         void update(Stat stat) {
-            disp.setProgress(stat.getMax()/stat.getValue());
+            disp.setProgress(stat.getValue()/stat.getMax());
             dispText.setText( Double.toString(stat.getValue())+"/"+Double.toString(stat.getMax()) );
         }
     }

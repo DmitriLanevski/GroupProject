@@ -98,9 +98,16 @@ public class GameServer implements Runnable {
                 }
                 sender.sendMessage(MessageTypes.SELF_SKILLS, skills);
                 sendBattleStats(sender);
+                break;
             }
             case MessageTypes.SKILL_USE: {
-                sender.getGameData().getActiveBattle().skillUse(sender.getGameData().getPlayerID(), gson.fromJson(message, String.class));
+                BattleInstance battleInstance = sender.getGameData().getActiveBattle();
+                synchronized (battleInstance) {
+                    battleInstance.skillUse( sender.getGameData().getPlayerID(), gson.fromJson(message, String.class) );
+                    for (ServerPlayerInfo user : battleInstance.getInformedUsers()) {
+                        sendBattleStats(user);
+                    }
+                }
                 break;
             }
             default: {
@@ -141,7 +148,19 @@ public class GameServer implements Runnable {
             player.getGameData().setPlayerID(1);
             player.sendMessage(MessageTypes.GAME_START, 1);
 
+            battle.addInformedUser(userAwaitingGame);
+            battle.addInformedUser(player);
+
             userAwaitingGame = null;
+
+            battle.setUpTicking(()->{
+                synchronized (battle) {
+                    battle.tick();
+                    for (ServerPlayerInfo user : battle.getInformedUsers()) {
+                        sendBattleStats(user);
+                    }
+                }
+            });
         }
         else
             userAwaitingGame = player;
