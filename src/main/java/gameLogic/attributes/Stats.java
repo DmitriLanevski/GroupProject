@@ -37,7 +37,7 @@ public class Stats {
 
     public static HashMap<String, Stat> getUniversals() {
         HashMap<String, Stat> all = new HashMap<>(universal);
-        all.replaceAll( (n, stat)->new Stat(stat) );
+        all.replaceAll( (n, stat)->new Stat(stat) ); // creates new instances
         return all;
     }
 }

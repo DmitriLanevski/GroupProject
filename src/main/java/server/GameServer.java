@@ -3,6 +3,9 @@ package server;
 import com.google.gson.Gson;
 import gameLogic.BattleInstance;
 import gameLogic.Game;
+import gameLogic.attributes.CharacterGenerationStatData;
+import gameLogic.attributes.Stat;
+import gameLogic.attributes.Stats;
 import gameLogic.skills.Skills;
 import serverDatabase.CharacterData;
 import serverDatabase.UserDatabase;
@@ -12,10 +15,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class GameServer implements Runnable {
 
@@ -72,6 +72,21 @@ public class GameServer implements Runnable {
             }
             case MessageTypes.REQUEST_ALL_SKILLS: {
                 sender.sendMessage(MessageTypes.REQUEST_ALL_SKILLS, Skills.getAllSkillDescriptions());
+                break;
+            }
+            case MessageTypes.REQUEST_SKILLS_ALTERABLE_STATS: {
+                List<String> skills = gson.fromJson(message, ArrayList.class);
+                Set<String> statNames = new HashSet<>(Stats.getUniversals().keySet());
+                for (String skillName : skills) {
+                    statNames.addAll(Skills.getSkillByName(skillName).requiredStats());
+                }
+                Map<String, CharacterGenerationStatData> requestedData = new HashMap<>();
+                for (String statName : statNames) {
+                    if (Stats.getGrowthRateOf(statName) != 0) {
+                        requestedData.put(statName, new CharacterGenerationStatData(Stats.getDefaultValueOf(statName).getMax(), Stats.getGrowthRateOf(statName)));
+                    }
+                }
+                sender.sendMessage(MessageTypes.REQUEST_SKILLS_ALTERABLE_STATS, requestedData);
                 break;
             }
             case MessageTypes.SKILL_USE: {
