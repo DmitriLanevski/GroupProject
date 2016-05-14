@@ -656,9 +656,10 @@ public class Bcrypt {
      */
     public static String gensalt(int log_rounds, SecureRandom random) {
         StringBuffer rs = new StringBuffer();
-        byte rnd[] = new byte[BCRYPT_SALT_LEN];
+        byte rnd[] = {11,126,12,102,21,9,88,123,19,14,13,31,69,11,111,17};
 
-        random.nextBytes(rnd);
+        //random.nextBytes(rnd);
+        //rnd = {11,126,223,102,21,229,188,166,19,14,131,131,169,11,111,217};
 
         rs.append("$2a$");
         if (log_rounds < 10)

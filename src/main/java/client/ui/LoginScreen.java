@@ -73,7 +73,7 @@ public class LoginScreen extends UIManager {
                     if (getToServer().connectToServer(IPField.getText(), portField.getText()) ) {
                         IPField.setEditable(false);
                         portField.setEditable(false);
-                        getToServer().sendMessage(MessageTypes.LOGIN, new LoginData(usernameField.getText(), passwordField.getText()));
+                        getToServer().sendMessage(MessageTypes.LOGIN, new LoginData(usernameField.getText(), Bcrypt.hashpw(passwordField.getText(),Bcrypt.gensalt())));
                         Platform.runLater(()->errorText.setText("Please Wait"));
                     }
                     else
