@@ -60,7 +60,7 @@ public class Stat {
             value = max;
     }
 
-    public void increaseMax(double add, boolean fill) {
+    public void increaseMax(double add) {
         max += add;
         value += add;
     }

@@ -6,6 +6,7 @@ import gameLogic.Game;
 import gameLogic.attributes.CharacterGenerationStatData;
 import gameLogic.attributes.Stat;
 import gameLogic.attributes.Stats;
+import gameLogic.skills.Skill;
 import gameLogic.skills.Skills;
 import serverDatabase.CharacterData;
 import serverDatabase.UserDatabase;
@@ -90,6 +91,14 @@ public class GameServer implements Runnable {
                 sender.sendMessage(MessageTypes.REQUEST_SKILLS_ALTERABLE_STATS, requestedData);
                 break;
             }
+            case MessageTypes.REQUEST_FULL_GAME_STATE: {
+                HashMap<String, String> skills = new HashMap<>();
+                for (String skillName : sender.getGameData().getChosenCharacter().getSkillIDs()) {
+                    skills.put(skillName, Skills.getSkillDescByName(skillName));
+                }
+                sender.sendMessage(MessageTypes.SELF_SKILLS, skills);
+                sendBattleStats(sender);
+            }
             case MessageTypes.SKILL_USE: {
                 sender.getGameData().getActiveBattle().skillUse(sender.getGameData().getPlayerID(), gson.fromJson(message, String.class));
                 break;
@@ -98,6 +107,12 @@ public class GameServer implements Runnable {
                 throw new RuntimeException("Invalid message of type '" + messageType + "'");
             }
         }
+    }
+
+    private void sendBattleStats(ServerPlayerInfo user) {
+        user.sendMessage(MessageTypes.SKILL_STATES, user.getGameData().getActiveBattle().getSkillStatesOfCharacter(user.getGameData().getPlayerID()));
+        user.sendMessage(MessageTypes.SELF_CHARACTER_STATUSES, user.getGameData().getActiveBattle().getStatsOfCharacter(user.getGameData().getPlayerID()));
+        user.sendMessage(MessageTypes.OPPOSING_CHARACTER_STATUSES, user.getGameData().getActiveBattle().getStatsOfCharacter(BattleInstance.opponentOf(user.getGameData().getPlayerID())));
     }
 
     private void attemptLogin(LoginData data, ServerPlayerInfo user) throws Exception {
@@ -125,6 +140,8 @@ public class GameServer implements Runnable {
 
             player.getGameData().setPlayerID(1);
             player.sendMessage(MessageTypes.GAME_START, 1);
+
+            userAwaitingGame = null;
         }
         else
             userAwaitingGame = player;

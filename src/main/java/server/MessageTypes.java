@@ -21,9 +21,11 @@ public class MessageTypes {
     public static final int REQUEST_ALL_SKILLS = 12;
     public static final int REQUEST_SKILLS_ALTERABLE_STATS = 13;
 
-    public static final int CHARACTER_STATUSES = 14;
-    public static final int SKILL_STATES = 15;
-    public static final int SKILL_USE = 16;
+    public static final int SELF_CHARACTER_STATUSES = 14;
+    public static final int OPPOSING_CHARACTER_STATUSES = 15;
+    public static final int SELF_SKILLS = 16;
+    public static final int SKILL_STATES = 17;
+    public static final int SKILL_USE = 18;
 
     public static final int CLOSE_THREAD = 10000;
 }

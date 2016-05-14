@@ -8,6 +8,7 @@ import gameLogic.skills.Skills;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Character {
     private HashMap<String, Stat> status;
@@ -19,6 +20,8 @@ public class Character {
     public Character(HashMap<String, Integer> skills, HashMap<String, Stat> status) {
         this.skills = skills;
         this.status = status;
+
+        System.out.println(this);
     }
 
     public void setOpponent(Character opponent) {
@@ -88,8 +91,8 @@ public class Character {
     public void useSkill(String skillName) {
         if (!canUseSkill(skillName)) return;
 
-        skills.replace(skillName, 0);
         Skills.getSkillByName(skillName).use(this, opponent);
+        skills.replace(skillName, 0);
     }
 
     public boolean canUseSkill(String skillName) {
@@ -99,9 +102,29 @@ public class Character {
             return false;
     }
 
+    public Map<String, Boolean> getSkillStates() {
+        Map<String, Boolean> states = new HashMap<>();
+        for (String skillName : skills.keySet()) {
+            states.put(skillName, canUseSkill(skillName));
+        }
+        return states;
+    }
+
     public void initPassives() {
         for (String skillName : skills.keySet()) {
             Skills.getSkillByName(skillName).onGameStart(this, opponent);
         }
+    }
+
+    public HashMap<String, Stat> getStatus() {
+        return status;
+    }
+
+    @Override
+    public String toString() {
+        return "Character{" +
+                "skills=" + skills +
+                ", status=" + status +
+                '}';
     }
 }

@@ -21,5 +21,9 @@ public class Skills {
         return skillCollection.get(name);
     }
 
+    public static String getSkillDescByName(String name) {
+        return skillDescriptions.get(name);
+    }
+
     public static HashMap<String, String> getAllSkillDescriptions() { return skillDescriptions; }
 }
