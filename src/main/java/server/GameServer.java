@@ -64,11 +64,11 @@ public class GameServer implements Runnable {
                 break;
             }
             case MessageTypes.REQUEST_CHARACTERS: {
-                sender.sendMessage(MessageTypes.REQUEST_CHARACTERS, sender.getGameData().getCharacters());
+                sender.sendMessage(MessageTypes.REQUEST_CHARACTERS, sender.getGameData().getCharacters().values());
                 break;
             }
             case MessageTypes.REQUEST_GAME_START: {
-                attemptStartGame(sender);
+                attemptStartGame(sender, gson.fromJson(message, String.class));
                 break;
             }
             case MessageTypes.REQUEST_ALL_SKILLS: {
@@ -112,9 +112,10 @@ public class GameServer implements Runnable {
         }
     }
 
-    private synchronized void attemptStartGame(ServerPlayerInfo player) {
-        if (player.getGameData().getChosenCharacter() == null) return;
-        if (userAwaitingGame != null) {
+    private synchronized void attemptStartGame(ServerPlayerInfo player, String charName) {
+        player.getGameData().setChosenCharacter(player.getGameData().getCharacters().get(charName));
+
+        if (userAwaitingGame != null & userAwaitingGame != player) {
             BattleInstance battle = new BattleInstance(Game.createCharacter(userAwaitingGame.getGameData().getChosenCharacter()), Game.createCharacter(player.getGameData().getChosenCharacter()));
             userAwaitingGame.getGameData().setActiveBattle(battle);
             player.getGameData().setActiveBattle(battle);
