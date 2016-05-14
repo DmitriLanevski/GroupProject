@@ -19,7 +19,7 @@ public class UserDatabase implements AutoCloseable {
     private final Connection conn;
 
     // getAllChars returns all Characters associated with this user.
-    public List<CharacterData> getAllChars(String userName) throws Exception {
+    public synchronized List<CharacterData> getAllChars(String userName) throws Exception {
         List<CharacterData> charList = new ArrayList<>();
         String checkCommand = "SELECT CharacterId FROM CharacterDatabase WHERE " +
                 "LoginName = ?;";
@@ -35,7 +35,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // getCharData return a single Character data based on ID of a character
-    public CharacterData getCharData(int charID) throws Exception {
+    public synchronized CharacterData getCharData(int charID) throws Exception {
         List<String> charSkills = showCharSkills(charID);
         Map<String,Long> charStats = showAllStats(charID);
         String checkCommand = "SELECT CharacterName FROM CharacterDatabase WHERE " +
@@ -54,11 +54,11 @@ public class UserDatabase implements AutoCloseable {
     }
 
     @Override
-    public void close() throws SQLException {
+    public synchronized void close() throws SQLException {
         conn.close();
     }
 
-    public static void main(String[] args) throws Exception {
+    public synchronized static void main(String[] args) throws Exception {
         UserDatabase database = new UserDatabase();
         //System.out.println("checkUserExistence:"+ database.checkUserExistence("Alpha"));
         System.out.println("registerUser:"+database.registerUser("Admin",Bcrypt.hashpw("GrandAdmin",Bcrypt.gensalt())));
@@ -70,7 +70,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // Checking if a given user even exists.
-    public boolean checkUserExistence(String username) throws SQLException {
+    public synchronized boolean checkUserExistence(String username) throws SQLException {
         String checkCommand = "SELECT LoginName FROM UserDatabase WHERE " +
                 "LoginName = ?;";
         PreparedStatement statement = conn.prepareStatement(checkCommand);
@@ -81,7 +81,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // Obvious. Registers a user with given Nickname+PW
-    public boolean registerUser(String username, String password) throws Exception {
+    public synchronized boolean registerUser(String username, String password) throws Exception {
         if (!checkUserExistence(username)) {
             String addUser = "INSERT INTO UserDatabase(LoginName,Password) VALUES (?,?);";
             PreparedStatement statement = conn.prepareStatement(addUser);
@@ -94,7 +94,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // Alters password. Needs further security checks on Server side
-    public boolean changePassword(String username, String password) throws Exception {
+    public synchronized boolean changePassword(String username, String password) throws Exception {
         if (checkUserExistence(username)) {
             String addUser = "UPDATE UserDatabase SET password=? WHERE loginName=?;";
             PreparedStatement statement = conn.prepareStatement(addUser);
@@ -107,7 +107,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // Login method. returns true if a given user exists and the Passwords match, false otherwise.
-    public boolean logIn (String username, String password) throws Exception {
+    public synchronized boolean logIn (String username, String password) throws Exception {
         if (checkUserExistence(username)) {
 
             String getPassword = "SELECT Password FROM UserDatabase WHERE LoginName = ?;";
@@ -123,7 +123,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // Method to add skills into the database
-    public boolean createSkill(String skillName, String skillDesc) throws SQLException {
+    public synchronized boolean createSkill(String skillName, String skillDesc) throws SQLException {
         if (!skillName.equals("")) {
             String command = "INSERT INTO Skills(SkillName,SkillDesc) VALUES (?,?);";
             PreparedStatement statement = conn.prepareStatement(command);
@@ -136,7 +136,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // Returns a map with skills and their descriptions. ALL skills.
-    public Map<String,String> showAllSkills() throws SQLException {
+    public synchronized Map<String,String> showAllSkills() throws SQLException {
         Map<String, String > theUltimateString = new HashMap<>();
         Statement stmt = null;
         String allChars = "SELECT SkillName,SkillDesc FROM Skills";
@@ -152,7 +152,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // Returns skills that are used by a certain character
-    public List<String> showCharSkills(int CharID) throws SQLException {
+    public synchronized List<String> showCharSkills(int CharID) throws SQLException {
         List<String> skillsOfCharN = new ArrayList<>();
         String allCharSkills = "SELECT SkillName FROM SkillAssign WHERE CharID = ?";
         PreparedStatement stmt = conn.prepareStatement(allCharSkills);
@@ -185,7 +185,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // Similiar to checkUserExistence. Controls if given user has given character.
-    public boolean checkCharExistence(String userName, String charName) throws SQLException {
+    public synchronized boolean checkCharExistence(String userName, String charName) throws SQLException {
 
         if (checkUserExistence(userName)) {
             String checkCommand = "SELECT CharacterId FROM CharacterDatabase WHERE " +
@@ -201,7 +201,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // creates an empty Statless and Skillless character bound to a given user.
-    public boolean createChar(String userName,  String charName) throws SQLException {
+    public synchronized boolean createChar(String userName,  String charName) throws SQLException {
         if (!checkCharExistence(userName, charName)) {
             String addCharacter = "INSERT INTO CharacterDatabase VALUES (?,?,0);";
             PreparedStatement statement = conn.prepareStatement(addCharacter);
@@ -214,7 +214,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // In testing. Possibly redundant.
-    public Map<String,Integer> showExistingChars(String userName) throws SQLException {
+    public synchronized Map<String,Integer> showExistingChars(String userName) throws SQLException {
         Map<String,Integer> theUltimateString = new HashMap<>();
         if (checkUserExistence(userName)) {
             String allChars = "SELECT CharacterName,CharacterEXP FROM CharacterDatabase WHERE LoginName = ?";
@@ -231,7 +231,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // Controls if a skill exists. Prevents Players from assigning non-existing skills to themselves
-    public boolean checkSkillExistence(int skillID) throws SQLException {
+    public synchronized boolean checkSkillExistence(int skillID) throws SQLException {
         String checkCommand = "SELECT SkillName FROM Skills WHERE " +
                 "SkillID = ?;";
         PreparedStatement statement = conn.prepareStatement(checkCommand);
@@ -241,7 +241,7 @@ public class UserDatabase implements AutoCloseable {
         return false;
     }
 
-    public boolean assignSkill(int charID, int[] skillIDs) throws SQLException {
+    public synchronized boolean assignSkill(int charID, int[] skillIDs) throws SQLException {
         String checkCommand = "DELETE FROM SkillAssign WHERE CharacterID = ?;";
         PreparedStatement statement = conn.prepareStatement(checkCommand);
         statement.setInt(1,charID);
@@ -259,7 +259,7 @@ public class UserDatabase implements AutoCloseable {
         return true;
     }
     //TODO
-    public Map<String,Long> showAllStats (int charID) throws SQLException {
+    public synchronized Map<String,Long> showAllStats (int charID) throws SQLException {
         String theCommand = "SELECT StatName,StatValue FROM CharData WHERE CharacterID = ?";
         PreparedStatement statement = conn.prepareStatement(theCommand);
         statement.setInt(1,charID);
@@ -276,7 +276,7 @@ public class UserDatabase implements AutoCloseable {
 
 
     // Starts the database
-    private void loadInitialData() throws SQLException, IOException {
+    private synchronized void loadInitialData() throws SQLException, IOException {
         try (Reader reader = new InputStreamReader(
                 UserDatabase.class.getClassLoader().getResourceAsStream("serverDatabase.sql"), "UTF-8")) {
             RunScript.execute(conn, reader);
@@ -284,7 +284,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // prints out certain requested data. Currently used to control if stuff we add is actually added.
-    public void dumpTable() throws SQLException {
+    public synchronized void dumpTable() throws SQLException {
         try (PreparedStatement ps = conn.prepareStatement("SELECT * from UserDatabase")) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
