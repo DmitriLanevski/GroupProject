@@ -14,12 +14,9 @@ import java.util.List;
 public class AddBuffsSkill extends Skill {
     private ArrayList<Buff> buffList;
 
-    private final List<String> reqs = new ArrayList<>();
-
     public AddBuffsSkill(String skillNameOrType, int cost, String stat, int cooldown, ArrayList<Buff> buffList) {
         super(skillNameOrType, cooldown, cost, stat);
         this.buffList = buffList;
-        reqs.add(stat);
     }
 
     @Override
@@ -35,10 +32,5 @@ public class AddBuffsSkill extends Skill {
                 opponent.addBuff(buff);
             }
         }
-    }
-
-    @Override
-    public List<String> requiredStats() {
-        return null;
     }
 }

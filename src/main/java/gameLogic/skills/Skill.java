@@ -3,12 +3,11 @@ package gameLogic.skills;
 import gameLogic.buffs.Buff;
 import gameLogic.characters.Character;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public abstract class Skill {
     private String skillNameOrType;
+    private Set<String> requiredStats = new HashSet<>();
 
     private final int cooldown;
     private final int cost;
@@ -19,6 +18,7 @@ public abstract class Skill {
         this.cooldown = cooldown;
         this.cost = cost;
         this.stat = stat;
+        addRequiredStat(stat);
     }
 
     public void use(Character user, Character opponent) {
@@ -34,7 +34,13 @@ public abstract class Skill {
         return user.getStatusValue(stat) >= cost & ticksSinceLastUse >= cooldown;
     }
 
-    public abstract List<String> requiredStats();
+    public Set<String> getRequiredStats() {
+        return requiredStats;
+    }
+
+    public void addRequiredStat(String statName) {
+        requiredStats.add(statName);
+    }
 
     public int getCooldown() {
         return cooldown;

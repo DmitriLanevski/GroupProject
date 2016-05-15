@@ -13,13 +13,10 @@ public class ChangeStatusSkill extends Skill {
     private final String statusName;
     private final int change;
 
-    private final List<String> reqs = new ArrayList<>();
-
     public ChangeStatusSkill(String skillNameOrType, String statusName, int change, int cost, String stat, int cooldown) {
         super(skillNameOrType, cooldown, cost, stat);
         this.statusName = statusName;
         this.change = change;
-        reqs.add(stat);
     }
 
     @Override
@@ -30,11 +27,6 @@ public class ChangeStatusSkill extends Skill {
 
         opponent.eventChangeStatusBy(statusName, change);
         user.eventChangeStatusBy(super.getStat(), super.getCost());
-    }
-
-    @Override
-    public List<String> requiredStats() {
-        return reqs;
     }
 
     public String getStatusName() {

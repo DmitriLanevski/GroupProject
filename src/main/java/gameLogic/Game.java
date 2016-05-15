@@ -24,7 +24,7 @@ public class Game {
 
         neccessaryStats.addAll(rawData.getStatIDs().keySet());
         for (String skillName : rawData.getSkillIDs()) {
-            neccessaryStats.addAll( Skills.getSkillByName(skillName).requiredStats() );
+            neccessaryStats.addAll( Skills.getSkillByName(skillName).getRequiredStats() );
         }
 
         for (String neccessaryStat : neccessaryStats) {

@@ -12,12 +12,9 @@ import java.util.List;
 public class AttackSkill extends Skill {
     private final int damage;
 
-    private final List<String> reqs = new ArrayList<>();
-
     public AttackSkill(String skillNameOrType, int cooldown, int cost, String stat, int damage) {
         super(skillNameOrType, cooldown, cost, stat);
         this.damage = damage;
-        reqs.add(stat);
     }
 
     @Override
@@ -28,11 +25,6 @@ public class AttackSkill extends Skill {
 
         opponent.eventDealDamage(damage);
         user.eventChangeStatusBy(super.getStat(), super.getCost());
-    }
-
-    @Override
-    public List<String> requiredStats() {
-        return reqs;
     }
 
     public int getDamage() {

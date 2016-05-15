@@ -12,13 +12,10 @@ import java.util.List;
 public class ChangeStatusWithBuffsSkill extends ChangeStatusSkill{
     private ArrayList<Buff> buffList;
 
-    private final List<String> reqs = new ArrayList<>();
-
     public ChangeStatusWithBuffsSkill(String skillNameOrType, String statusName, int change, int cost, String stat,
                                       int cooldown, ArrayList<Buff> buffList) {
         super(skillNameOrType, statusName, change, cost, stat, cooldown);
         this.buffList = buffList;
-        reqs.add(stat);
     }
 
     @Override
@@ -38,10 +35,5 @@ public class ChangeStatusWithBuffsSkill extends ChangeStatusSkill{
             }
         }
         user.eventChangeStatusBy(super.getStat(), super.getCost());
-    }
-
-    @Override
-    public List<String> requiredStats() {
-        return reqs;
     }
 }

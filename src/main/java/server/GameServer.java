@@ -79,7 +79,7 @@ public class GameServer implements Runnable {
                 List<String> skills = gson.fromJson(message, ArrayList.class);
                 Set<String> statNames = new HashSet<>(Stats.getUniversals().keySet());
                 for (String skillName : skills) {
-                    statNames.addAll(Skills.getSkillByName(skillName).requiredStats());
+                    statNames.addAll(Skills.getSkillByName(skillName).getRequiredStats());
                 }
                 Map<String, CharacterGenerationStatData> requestedData = new HashMap<>();
                 for (String statName : statNames) {
