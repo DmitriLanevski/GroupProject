@@ -24,7 +24,8 @@ public class AttackSkill extends SingleCostSkill {
         opponent.eventDefend();
 
         opponent.eventDealDamage(damage);
-        user.eventChangeStatusBy(super.getStat(), super.getCost());
+
+        applyCost(user);
     }
 
     public int getDamage() {

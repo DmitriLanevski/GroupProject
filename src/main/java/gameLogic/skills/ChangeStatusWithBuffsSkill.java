@@ -28,6 +28,6 @@ public class ChangeStatusWithBuffsSkill extends ChangeStatusSkill{
         opponent.eventChangeStatusBy(super.getStatusName(), super.getChange());
         buffList.applyBuffs(user, opponent, getSkillNameOrType());
 
-        user.eventChangeStatusBy(super.getStat(), super.getCost());
+        applyCost(user);
     }
 }

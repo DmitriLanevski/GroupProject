@@ -25,7 +25,7 @@ public class AttackWithBuffsSkill extends AttackSkill {
         opponent.eventDealDamage(super.getDamage());
         buffList.applyBuffs(user, opponent, getSkillNameOrType());
 
-        user.eventChangeStatusBy(super.getStat(), super.getCost());
+        applyCost(user);
     }
 
 }

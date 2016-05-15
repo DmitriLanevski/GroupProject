@@ -22,6 +22,10 @@ public class SingleCostSkill extends Skill {
         return user.getStatusValue(stat) >= -cost & ticksSinceLastUse >= cooldown;
     }
 
+    protected void applyCost(Character user) {
+        user.eventChangeStatusBy(getStat(), getCost());
+    }
+
     public int getCooldown() {
         return cooldown;
     }

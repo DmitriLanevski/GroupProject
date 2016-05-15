@@ -27,7 +27,7 @@ public class ChangeStatusSkill extends SingleCostSkill {
 
         opponent.eventChangeStatusBy(statusName, change);
 
-        user.eventChangeStatusBy(super.getStat(), super.getCost());
+        applyCost(user);
     }
 
     public String getStatusName() {

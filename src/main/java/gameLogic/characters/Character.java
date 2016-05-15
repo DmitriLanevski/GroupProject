@@ -53,11 +53,13 @@ public class Character {
     }
 
     public double changeStatus(String statusName, double amount) {
+        System.out.println(statusName + " changed by " + amount);
         return status.get(statusName).changeValueBy(amount);
     }
 
     public void eventChangeStatusBy(String statusName, double amount) {
         double change = changeStatus(statusName, amount);
+
         activeBuffs.forEach((buff)->buff.onStatusChange(statusName, change));
     }
 
@@ -90,6 +92,8 @@ public class Character {
 
     public void useSkill(String skillName) {
         if (!canUseSkill(skillName)) return;
+
+        System.out.println(name + " used skill " + skillName);
 
         Skills.getSkillByName(skillName).use(this, opponent);
         skills.replace(skillName, 0);
