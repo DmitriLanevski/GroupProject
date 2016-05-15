@@ -19,13 +19,7 @@ public class AttackWithBuffsSkill extends AttackSkill {
     @Override
     public void use(Character user, Character opponent) {
         super.use(user, opponent);
-        user.eventAttack();
-        opponent.eventDefend();
-
-        opponent.eventDealDamage(super.getDamage());
         buffList.applyBuffs(user, opponent, getSkillNameOrType());
-
-        applyCost(user);
     }
 
 }

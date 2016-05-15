@@ -24,33 +24,33 @@ public class Skills {
                 new AttackSkill("Berserker Strike.phys", 50, -10, "Stamina", 30));
 
         addSkill("Rest to heal", "PLACEHOLDER_DESC",
-                new ChangeStatusSkill("Rest to heal", "Health", 35, -10, "Stamina", 30));
+                new ChangeStatusSkill("Rest to heal", "Health", 35, -10, "Stamina", 30, true));
 
         addSkill("Magical acupuncture", "PLACEHOLDER_DESC",
-                new ChangeStatusSkill("Magical acupuncture", "Health", 35, -10, "Mana", 30));
+                new ChangeStatusSkill("Magical acupuncture", "Health", 35, -10, "Mana", 30, true));
 
         addSkill("Willpower", "PLACEHOLDER_DESC",
-                new ChangeStatusSkill("Willpower", "Stamina", 100, -40, "Mana", 30));
+                new ChangeStatusSkill("Willpower", "Stamina", 100, -40, "Mana", 30, true));
 
         addSkill("Brace yourself", "PLACEHOLDER_DESC",
                 new AddBuffsSkill("Brace yourself", -10, "Stamina", 30,
-                        new BuffApplier(true, Arrays.asList(
-                                new SimpleStatBuff(dummyChar, dummyChar, 20, "", "Strength", 20)))));
+                        new BuffApplier(Arrays.asList(
+                                new SimpleStatBuff(true, dummyChar, dummyChar, "", "Strength", 20, 20)))));
 
         addSkill("ortification", "PLACEHOLDER_DESC",
                 new AddBuffsSkill("Fortification", -10, "Stamina", 30,
-                        new BuffApplier(true, Arrays.asList(
-                                new SimpleStatBuff(dummyChar, dummyChar, 20, "", "Strength", 20)))));
+                        new BuffApplier(Arrays.asList(
+                                new SimpleStatBuff(true, dummyChar, dummyChar,  "", "Strength", 20, 20)))));
 
         addSkill("Mind blessing", "PLACEHOLDER_DESC",
                 new AddBuffsSkill("Mind blessing", -10, "Stamina", 30,
-                        new BuffApplier(true, Arrays.asList(
-                                new SimpleStatBuff(dummyChar, dummyChar, 20, "", "Intelligence", 20)))));
+                        new BuffApplier(Arrays.asList(
+                                new SimpleStatBuff(true, dummyChar, dummyChar,  "", "Intelligence", 20, 20)))));
 
         addSkill("Force shield", "PLACEHOLDER_DESC",
                 new AddBuffsSkill("Force shield", -10, "Mana", 30,
-                        new BuffApplier(true, Arrays.asList(
-                                new SimpleStatBuff(dummyChar, dummyChar, 20, "", "Defence", 20)))));
+                        new BuffApplier(Arrays.asList(
+                                new SimpleStatBuff(true, dummyChar, dummyChar,  "", "Defence", 20, 20)))));
     }
 
     private static void addSkill(String name, String desc, Skill skill) {

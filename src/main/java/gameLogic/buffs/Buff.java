@@ -6,10 +6,11 @@ import java.util.ArrayList;
 
 public abstract class Buff implements Cloneable {
 
+    private boolean selfApply;
     private Character user;
     private Character opponent;
-    protected int durationInTicks;
     private String skillNameOrType;
+    protected int durationInTicks;
     protected int timePassedInTicks = 0;
 
     /**
@@ -18,7 +19,8 @@ public abstract class Buff implements Cloneable {
      * @param opponent The opponent of the buffed character.
      * @param durationInTicks Duration of the buff. -1 indicates a permanent buff.
      */
-    public Buff(Character user, Character opponent, int durationInTicks, String skillNameOrType) {
+    public Buff(boolean selfApply, Character user, Character opponent, String skillNameOrType,int durationInTicks) {
+        this.selfApply = selfApply;
         this.user = user;
         this.opponent = opponent;
         this.durationInTicks = durationInTicks;
@@ -146,6 +148,10 @@ public abstract class Buff implements Cloneable {
             return nameAndType;
         }
 
+    }
+
+    public boolean isSelfApply() {
+        return selfApply;
     }
 
     @Override

@@ -23,9 +23,7 @@ public class AddBuffsSkill extends SingleCostSkill {
     @Override
     public void use(Character user, Character opponent) {
         super.use(user, opponent);
-
         buffList.applyBuffs(user, opponent, getSkillNameOrType());
-
         applyCost(user);
     }
 }

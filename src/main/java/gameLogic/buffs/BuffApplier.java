@@ -8,18 +8,16 @@ import java.util.List;
  * Created by Madis on 15.05.2016.
  */
 public class BuffApplier {
-    private boolean selfApply;
     private List<Buff> buffs;
 
-    public BuffApplier(boolean selfApply, List<Buff> buffs) {
-        this.selfApply = selfApply;
+    public BuffApplier(List<Buff> buffs) {
         this.buffs = buffs;
     }
 
     public void applyBuffs(Character user, Character opponent, String skillNameOrType) {
         for (Buff buff : buffs) {
             Buff newBuff = buff.clone();
-            if (selfApply) {
+            if (newBuff.isSelfApply()) {
                 newBuff.setUser(user);
                 newBuff.setOpponent(opponent);
                 newBuff.setSkillNameOrType(skillNameOrType);

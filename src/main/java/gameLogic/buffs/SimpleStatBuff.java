@@ -9,8 +9,9 @@ public class SimpleStatBuff extends Buff {
     private String statusName;
     private double amount;
 
-    public SimpleStatBuff(Character user, Character opponent, int durationInTicks, String skillNameOrType, String statusName, double amount) {
-        super(user, opponent, durationInTicks, skillNameOrType);
+    public SimpleStatBuff(boolean selfApply, Character user, Character opponent, String skillNameOrType,
+                          String statusName, double amount, int durationInTicks) {
+        super(selfApply, user, opponent, skillNameOrType, durationInTicks);
         this.statusName = statusName;
         this.amount = amount;
     }

@@ -8,8 +8,9 @@ import gameLogic.characters.Character;
 public class NonRecursiveBuff extends Buff {
     private boolean recursionLock = false;
 
-    public NonRecursiveBuff(Character user, Character opponent, int durationInTicks, String skillNameOrType) {
-        super(user, opponent, durationInTicks, skillNameOrType);
+    public NonRecursiveBuff(boolean selfApply, Character user, Character opponent, String skillNameOrType,
+                            int durationInTicks) {
+        super(selfApply, user, opponent, skillNameOrType, durationInTicks);
     }
 
     // Done this way so someone doesn't accidentally overwrite the lock. If lock is unneccessary, just use Buff instead.
