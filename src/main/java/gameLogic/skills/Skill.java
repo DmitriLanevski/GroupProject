@@ -9,16 +9,9 @@ public abstract class Skill {
     private String skillNameOrType;
     private Set<String> requiredStats = new HashSet<>();
 
-    private final int cooldown;
-    private final int cost;
-    private final String stat;
 
-    public Skill(String skillNameOrType, int cooldown, int cost, String stat) {
+    public Skill(String skillNameOrType) {
         this.skillNameOrType = skillNameOrType;
-        this.cooldown = cooldown;
-        this.cost = cost;
-        this.stat = stat;
-        addRequiredStat(stat);
     }
 
     public void use(Character user, Character opponent) {
@@ -30,9 +23,7 @@ public abstract class Skill {
 
     }
 
-    public boolean canUse(Character user, Character opponent, int ticksSinceLastUse) {
-        return user.getStatusValue(stat) >= cost & ticksSinceLastUse >= cooldown;
-    }
+    public abstract boolean canUse(Character user, Character opponent, int ticksSinceLastUse);
 
     public Set<String> getRequiredStats() {
         return requiredStats;
@@ -40,18 +31,6 @@ public abstract class Skill {
 
     public void addRequiredStat(String statName) {
         requiredStats.add(statName);
-    }
-
-    public int getCooldown() {
-        return cooldown;
-    }
-
-    public int getCost() {
-        return cost;
-    }
-
-    public String getStat() {
-        return stat;
     }
 
     public String getSkillNameOrType() {

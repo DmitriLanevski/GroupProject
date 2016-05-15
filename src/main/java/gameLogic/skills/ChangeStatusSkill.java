@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by lanev_000 on 15.05.2016.
  */
-public class ChangeStatusSkill extends Skill {
+public class ChangeStatusSkill extends SingleCostSkill {
     private final String statusName;
     private final int change;
 

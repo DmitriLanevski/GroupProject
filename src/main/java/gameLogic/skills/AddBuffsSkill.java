@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * Created by lanev_000 on 14.05.2016.
  */
-public class AddBuffsSkill extends Skill {
+public class AddBuffsSkill extends SingleCostSkill {
     private ArrayList<Buff> buffList;
 
     public AddBuffsSkill(String skillNameOrType, int cost, String stat, int cooldown, ArrayList<Buff> buffList) {

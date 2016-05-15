@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Created by lanev_000 on 15.05.2016.
  */
-public class AttackSkill extends Skill {
+public class AttackSkill extends SingleCostSkill {
     private final int damage;
 
     public AttackSkill(String skillNameOrType, int cooldown, int cost, String stat, int damage) {
