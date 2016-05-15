@@ -9,6 +9,7 @@ import java.util.List;
 
 public abstract class Skill {
     private String skillNameOrType;
+
     private final int cooldown;
     private final int cost;
     private final String stat;

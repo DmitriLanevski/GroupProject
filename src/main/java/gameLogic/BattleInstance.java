@@ -62,8 +62,8 @@ public class BattleInstance {
         checkForDeaths();
     }
 
-    public synchronized HashMap<String, Stat> getStatsOfCharacter(int ID) {
-        HashMap<String, Stat> status = players[ID].getStatus();
+    public synchronized Map<String, Stat> getStatsOfCharacter(int ID) {
+        Map<String, Stat> status = players[ID].getStatus();
         status.replaceAll( (n, stat)->new Stat(stat) );
         return status;
     }

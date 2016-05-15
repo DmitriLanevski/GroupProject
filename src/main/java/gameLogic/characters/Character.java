@@ -12,18 +12,16 @@ import java.util.Map;
 
 public class Character {
     private String name;
-    private HashMap<String, Stat> status;
-    private HashMap<String, Integer> skills;
+    private Map<String, Stat> status;
+    private Map<String, Integer> skills;
     private List<Buff> activeBuffs = new ArrayList<>();
 
     private Character opponent;
 
-    public Character(String name, HashMap<String, Integer> skills, HashMap<String, Stat> status) {
+    public Character(String name, Map<String, Integer> skills, Map<String, Stat> status) {
         this.name = name;
         this.skills = skills;
         this.status = status;
-
-        System.out.println(this);
     }
 
     public void setOpponent(Character opponent) {
@@ -118,7 +116,7 @@ public class Character {
         }
     }
 
-    public HashMap<String, Stat> getStatus() {
+    public Map<String, Stat> getStatus() {
         return status;
     }
 

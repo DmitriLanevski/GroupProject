@@ -12,7 +12,7 @@ public class Skills {
     static private HashMap<String, Skill> skillCollection = new HashMap<>();
     static private HashMap<String, String> skillDescriptions = new HashMap<>();
 
-    static private Character dummyChar = new Character(new HashMap<>(),new HashMap<>());
+    static private Character dummyChar = new Character("",new HashMap<>(),new HashMap<>());
 
     static {
         addSkill("Ferocious Strike","PLACEHOLDER_DESC",

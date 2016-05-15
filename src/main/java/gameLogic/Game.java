@@ -3,24 +3,35 @@ package gameLogic;
 import gameLogic.attributes.Stat;
 import gameLogic.attributes.Stats;
 import gameLogic.characters.Character;
+import gameLogic.skills.Skills;
 import serverDatabase.CharacterData;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Game {
     public static Character createCharacter(CharacterData rawData) {
         HashMap<String, Integer> skills = new HashMap<>();
         HashMap<String, Stat> stats = Stats.getUniversals();
 
-        for (String skillID : rawData.getSkillIDs()) {
-            skills.put(skillID, 0);
+        for (String skillName : rawData.getSkillIDs()) {
+            skills.put(skillName, 0);
         }
 
-        System.out.println("Universals = " + stats);
         // Initializes all the stored stats and adds allocated additional points.
-        for (String statID : rawData.getStatIDs().keySet()) {
-            if (!stats.containsKey(statID)) stats.put(statID, Stats.getDefaultValueOf(statID));
+        Set<String> neccessaryStats = new HashSet<>();
 
+        neccessaryStats.addAll(rawData.getStatIDs().keySet());
+        for (String skillName : rawData.getSkillIDs()) {
+            neccessaryStats.addAll( Skills.getSkillByName(skillName).requiredStats() );
+        }
+
+        for (String neccessaryStat : neccessaryStats) {
+            if (!stats.containsKey(neccessaryStat)) stats.put(neccessaryStat, Stats.getDefaultValueOf(neccessaryStat));
+        }
+
+        for (String statID : rawData.getStatIDs().keySet()) {
             stats.get(statID).increaseMax(Stats.getGrowthRateOf(statID)*rawData.getStatIDs().get(statID));
         }
 
