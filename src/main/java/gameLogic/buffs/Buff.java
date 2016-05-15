@@ -4,12 +4,11 @@ import gameLogic.characters.Character;
 
 import java.util.ArrayList;
 
-public abstract class Buff {
+public abstract class Buff implements Cloneable {
 
     private Character user;
     private Character opponent;
     protected int durationInTicks;
-    private boolean isSelf;
     private String skillNameOrType;
     protected int timePassedInTicks = 0;
 
@@ -19,12 +18,11 @@ public abstract class Buff {
      * @param opponent The opponent of the buffed character.
      * @param durationInTicks Duration of the buff. -1 indicates a permanent buff.
      */
-    public Buff(Character user, Character opponent, int durationInTicks, String skillNameOrType, boolean isSelf) {
+    public Buff(Character user, Character opponent, int durationInTicks, String skillNameOrType) {
         this.user = user;
         this.opponent = opponent;
         this.durationInTicks = durationInTicks;
         this.skillNameOrType = skillNameOrType;
-        this.isSelf = isSelf;
     }
 
     /**
@@ -112,10 +110,6 @@ public abstract class Buff {
         this.user = user;
     }
 
-    public boolean isSelf() {
-        return isSelf;
-    }
-
     public void setOpponent(Character opponent) {
         this.opponent = opponent;
     }
@@ -152,5 +146,15 @@ public abstract class Buff {
             return nameAndType;
         }
 
+    }
+
+    @Override
+    public Buff clone() {
+        try {
+            return (Buff) super.clone();
+        }
+        catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
