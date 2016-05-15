@@ -57,7 +57,7 @@ public class Skills {
         );
 
         addSkill("Force shield","PLACEHOLDER_DESC",
-                new AddBuffsSkill("Force shield", -10, "mana", 30,
+                new AddBuffsSkill("Force shield", -10, "Mana", 30,
                         new BuffApplier(true, Arrays.asList(
                                 new SimpleStatBuff(dummyChar,dummyChar, 20, "", "Defence", 20)
                         ))

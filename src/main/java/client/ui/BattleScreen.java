@@ -51,6 +51,8 @@ public class BattleScreen extends UIManager {
         selfStatsRoot.getChildren().clear();
         enemystats.clear();
         enemyStatsRoot.getChildren().clear();
+        skillButtons.clear();
+        skillButtonsRoot.getChildren().clear();
 
         getToServer().sendMessage(MessageTypes.REQUEST_FULL_GAME_STATE, "");
     }
