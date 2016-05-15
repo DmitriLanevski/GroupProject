@@ -66,12 +66,12 @@ public class Character {
         activeBuffs.forEach((buff)->buff.onDamageTaken(amount));
     }
 
-    public void eventSkillUsed() {
-        activeBuffs.forEach(Buff::onSkillUse);
+    public void eventSkillUsed(String skillNameOrType) {
+        activeBuffs.forEach((buff)->buff.onSkillUse(skillNameOrType));
     }
 
-    public void eventEnemySkillUsed() {
-        activeBuffs.forEach(Buff::onOpponentSkillUse);
+    public void eventEnemySkillUsed(String skillNameOrType) {
+        activeBuffs.forEach((buff)->buff.onOpponentSkillUse(skillNameOrType));
     }
 
     public void eventAttack() {

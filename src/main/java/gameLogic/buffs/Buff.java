@@ -2,11 +2,15 @@ package gameLogic.buffs;
 
 import gameLogic.characters.Character;
 
+import java.util.ArrayList;
+
 public abstract class Buff {
 
     private Character user;
     private Character opponent;
     protected int durationInTicks;
+    private boolean isSelf;
+    private String skillNameOrType;
     protected int timePassedInTicks = 0;
 
     /**
@@ -15,10 +19,12 @@ public abstract class Buff {
      * @param opponent The opponent of the buffed character.
      * @param durationInTicks Duration of the buff. -1 indicates a permanent buff.
      */
-    public Buff(Character user, Character opponent, int durationInTicks) {
+    public Buff(Character user, Character opponent, int durationInTicks, String skillNameOrType, boolean isSelf) {
         this.user = user;
         this.opponent = opponent;
         this.durationInTicks = durationInTicks;
+        this.skillNameOrType = skillNameOrType;
+        this.isSelf = isSelf;
     }
 
     /**
@@ -46,14 +52,14 @@ public abstract class Buff {
     /**
      * Called when buffed character uses a skill
      */
-    public void onSkillUse() {
+    public void onSkillUse(String skillNameOrType) {
 
     }
 
     /**
      * Called when the opponent uses a skill
      */
-    public void onOpponentSkillUse() {
+    public void onOpponentSkillUse(String skillNameOrType) {
 
     }
 
@@ -106,6 +112,10 @@ public abstract class Buff {
         this.user = user;
     }
 
+    public boolean isSelf() {
+        return isSelf;
+    }
+
     public void setOpponent(Character opponent) {
         this.opponent = opponent;
     }
@@ -121,5 +131,26 @@ public abstract class Buff {
     public int getTicksLeft() {
         if (durationInTicks == -1) return -1;
         return durationInTicks-timePassedInTicks;
+    }
+
+    public String getSkillNameOrType() {
+        return skillNameOrType;
+    }
+
+    public void setSkillNameOrType(String skillNameOrType) {
+        this.skillNameOrType = skillNameOrType;
+    }
+
+    public ArrayList<String> AnalyzeSkillNameOrType(String skillNameOrType){
+        ArrayList<String> nameAndType = new ArrayList<>();
+        if ((skillNameOrType.split("\\.")).length > 1){
+            nameAndType.add(skillNameOrType.split("\\.")[0]);
+            nameAndType.add(skillNameOrType.split("\\.")[1]);
+            return nameAndType;
+        } else {
+            nameAndType.add(skillNameOrType.split("\\.")[0]);
+            return nameAndType;
+        }
+
     }
 }

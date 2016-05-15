@@ -1,29 +1,23 @@
 package gameLogic.skills;
 
+import gameLogic.buffs.Buff;
 import gameLogic.characters.Character;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleAttack extends Skill {
+/**
+ * Created by lanev_000 on 15.05.2016.
+ */
+public class AttackSkill extends Skill {
     private final int damage;
-    private final int cooldown;
-    private final int cost;
-    private final String stat;
 
     private final List<String> reqs = new ArrayList<>();
 
-    public SimpleAttack(int cooldown, int damage, int cost, String stat) {
-        this.cooldown = cooldown;
+    public AttackSkill(String skillNameOrType, int cooldown, int cost, String stat, int damage) {
+        super(skillNameOrType, cooldown, cost, stat);
         this.damage = damage;
-        this.cost = cost;
-        this.stat = stat;
         reqs.add(stat);
-    }
-
-    @Override
-    public boolean canUse(Character user, Character opponent, int ticksSinceLastUse) {
-        return user.getStatusValue(stat) >= -cost & ticksSinceLastUse >= cooldown;
     }
 
     @Override
@@ -33,11 +27,15 @@ public class SimpleAttack extends Skill {
         opponent.eventDefend();
 
         opponent.eventDealDamage(damage);
-        user.eventChangeStatusBy(stat, cost);
+        user.eventChangeStatusBy(super.getStat(), super.getCost());
     }
 
     @Override
     public List<String> requiredStats() {
         return reqs;
+    }
+
+    public int getDamage() {
+        return damage;
     }
 }

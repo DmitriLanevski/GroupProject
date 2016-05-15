@@ -1,22 +1,42 @@
 package gameLogic.skills;
 
+import gameLogic.buffs.Buff;
+import gameLogic.buffs.SimpleStatBuff;
+import gameLogic.characters.Character;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Skills {
     static private HashMap<String, Skill> skillCollection = new HashMap<>();
     static private HashMap<String, String> skillDescriptions = new HashMap<>();
 
-    static {
-        addSkill("Ferocious Strike","PLACEHOLDER_DESC", new SimpleAttack(10, 20, -10, "Stamina"));
-        addSkill("Berserker Strike","PLACEHOLDER_DESC", new SimpleAttack(10, 50, -10, "Health"));
-        addSkill("Rest to heal", "PLACEHOLDER_DESC", new SimpleBuffDeBuffSkill(35,"Health",-1,true,-20,"Stamina",10));
-        addSkill("Magical acupuncture", "PLACEHOLDER_DESC", new SimpleBuffDeBuffSkill(35,"Health",-1,true,-20,"Mana",10));
-        addSkill("Willpower", "PLACEHOLDER_DESC", new SimpleBuffDeBuffSkill(100,"Stamina",-1,true,-40,"Mana",30));
-        addSkill("Brace yourself", "PLACEHOLDER_DESC", new SimpleBuffDeBuffSkill(20,"Strength",30,true,-10,"Stamina",20));
-        addSkill("Fortification", "PLACEHOLDER_DESC", new SimpleBuffDeBuffSkill(20,"Defence",30,true,-10,"Stamina",20));
-        addSkill("Mind blessing", "PLACEHOLDER_DESC", new SimpleBuffDeBuffSkill(35,"Intelligence",30,true,-10,"Mana",20));
-        addSkill("Force shield", "PLACEHOLDER_DESC", new SimpleBuffDeBuffSkill(35,"Defence",30,true,-10,"Mana",20));
+    static private Character dummyChar = new Character(new HashMap<>(),new HashMap<>());
 
+    static {
+        addSkill("Ferocious Strike","PLACEHOLDER_DESC",
+                new AttackSkill("Ferocious Strike.phys", 30, -10, "Stamina", 30));
+        addSkill("Berserker Strike","PLACEHOLDER_DESC",
+                new AttackSkill("Berserker Strike.phys", 50, -10, "Stamina", 30));
+        addSkill("Rest to heal","PLACEHOLDER_DESC",
+                new ChangeStatusSkill("Rest to heal", "Health", 35, -10, "Stamina", 30));
+        addSkill("Magical acupuncture","PLACEHOLDER_DESC",
+                new ChangeStatusSkill("Magical acupuncture", "Health", 35, -10, "Mana", 30));
+        addSkill("Willpower","PLACEHOLDER_DESC",
+                new ChangeStatusSkill("Willpower", "Stamina", 100, -40, "Mana", 30));
+        addSkill("Brace yourself","PLACEHOLDER_DESC",
+                new AddBuffsSkill("Brace yourself", -10, "Stamina", 30, new ArrayList<Buff>(Arrays.asList(
+                        new SimpleStatBuff(dummyChar,dummyChar, 20, "", true, "Strength", 20)))));
+        addSkill("ortification","PLACEHOLDER_DESC",
+                new AddBuffsSkill("Fortification", -10, "Stamina", 30, new ArrayList<Buff>(Arrays.asList(
+                        new SimpleStatBuff(dummyChar,dummyChar, 20, "", true, "Strength", 20)))));
+        addSkill("Mind blessing","PLACEHOLDER_DESC",
+                new AddBuffsSkill("Mind blessing", -10, "Stamina", 30, new ArrayList<Buff>(Arrays.asList(
+                        new SimpleStatBuff(dummyChar,dummyChar, 20, "", true, "Intelligence", 20)))));
+        addSkill("Force shield","PLACEHOLDER_DESC",
+                new AddBuffsSkill("Force shield", -10, "mana", 30, new ArrayList<Buff>(Arrays.asList(
+                        new SimpleStatBuff(dummyChar,dummyChar, 20, "", true, "Defence", 20)))));
     }
 
     private static void addSkill(String name, String desc, Skill skill) {

@@ -9,10 +9,11 @@ public class StatOverTimeBuff extends Buff {
     private String statusName;
     private double changePerTick;
 
-    public StatOverTimeBuff(Character user, Character opponent, int durationInTicks, double changePerTick, String statusName) {
-        super(user, opponent, durationInTicks);
-        this.changePerTick = changePerTick;
+    public StatOverTimeBuff(Character user, Character opponent, int durationInTicks, String skillNameOrType,
+                            boolean isSelf, String statusName, double changePerTick) {
+        super(user, opponent, durationInTicks, skillNameOrType, isSelf);
         this.statusName = statusName;
+        this.changePerTick = changePerTick;
     }
 
     @Override

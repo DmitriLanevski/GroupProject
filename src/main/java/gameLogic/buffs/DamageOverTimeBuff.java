@@ -8,8 +8,9 @@ import gameLogic.characters.Character;
 public class DamageOverTimeBuff extends Buff {
     private double damagePerTick;
 
-    public DamageOverTimeBuff(Character user, Character opponent, int durationInTicks, double damagePerTick) {
-        super(user, opponent, durationInTicks);
+    public DamageOverTimeBuff(Character user, Character opponent, int durationInTicks, String skillNameOrType,
+                              boolean isSelf, double damagePerTick) {
+        super(user, opponent, durationInTicks, skillNameOrType, isSelf);
         this.damagePerTick = damagePerTick;
     }
 
