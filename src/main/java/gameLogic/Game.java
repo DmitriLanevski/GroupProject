@@ -24,6 +24,6 @@ public class Game {
             stats.get(statID).increaseMax(Stats.getGrowthRateOf(statID)*rawData.getStatIDs().get(statID));
         }
 
-        return new Character(skills, stats);
+        return new Character(rawData.getCharName(), skills, stats);
     }
 }

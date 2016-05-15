@@ -13,6 +13,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class BattleInstance {
+    private boolean over = false;
+
     private final Character[] players = new Character[2];
     private final List<ServerPlayerInfo> users = new ArrayList<>();
 
@@ -32,8 +34,12 @@ public class BattleInstance {
     }
 
     public synchronized void tick() {
+        if (over) return;
+
         players[0].tick();
         players[1].tick();
+
+        checkForDeaths();
     }
 
     public synchronized void setUpTicking(Runnable runnable) {
@@ -49,7 +55,11 @@ public class BattleInstance {
     }
 
     public synchronized void skillUse(int playerID, String skillName) {
+        if (over) return;
+
         players[playerID].useSkill(skillName);
+
+        checkForDeaths();
     }
 
     public synchronized HashMap<String, Stat> getStatsOfCharacter(int ID) {
@@ -62,8 +72,36 @@ public class BattleInstance {
         return players[ID].getSkillStates();
     }
 
+    public synchronized void checkForDeaths() {
+        if (someoneDied()) {
+            over = true;
+            ticker.shutdown();
+        }
+    }
+
+    public synchronized boolean someoneDied() {
+        for (Character player : players) {
+            if (player.getStatusValue("Health") < 0) return true;
+        }
+        return false;
+    }
+
     public static int opponentOf(int playerID) {
         if (playerID == 0) return 1;
         else return 0;
+    }
+
+    public boolean isOver() {
+        return over;
+    }
+
+    public synchronized Character getWinner() {
+        if (players[0].getStatusValue("Health") < 0 & players[1].getStatusValue("Health") < 0) {
+            return null;
+        } else if (players[0].getStatusValue("Health") < 0) {
+            return players[1];
+        } else {
+            return players[0];
+        }
     }
 }

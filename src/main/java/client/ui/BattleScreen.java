@@ -117,6 +117,9 @@ public class BattleScreen extends UIManager {
                 }
                 break;
             }
+            case MessageTypes.GAME_OVER: {
+                getParentManager().activate(new GameOverScreen(getParentManager(), message.readAs(String.class)));
+            }
         }
     }
 

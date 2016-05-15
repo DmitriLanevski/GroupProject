@@ -27,5 +27,7 @@ public class MessageTypes {
     public static final int SKILL_STATES = 17;
     public static final int SKILL_USE = 18;
 
+    public static final int GAME_OVER = 19;
+
     public static final int CLOSE_THREAD = 10000;
 }

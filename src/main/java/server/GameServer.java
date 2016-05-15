@@ -4,9 +4,8 @@ import com.google.gson.Gson;
 import gameLogic.BattleInstance;
 import gameLogic.Game;
 import gameLogic.attributes.CharacterGenerationStatData;
-import gameLogic.attributes.Stat;
 import gameLogic.attributes.Stats;
-import gameLogic.skills.Skill;
+import gameLogic.characters.Character;
 import gameLogic.skills.Skills;
 import serverDatabase.CharacterData;
 import serverDatabase.UserDatabase;
@@ -107,6 +106,8 @@ public class GameServer implements Runnable {
                     for (ServerPlayerInfo user : battleInstance.getInformedUsers()) {
                         sendBattleStats(user);
                     }
+                    if (battleInstance.isOver())
+                        endGame(battleInstance);
                 }
                 break;
             }
@@ -164,6 +165,20 @@ public class GameServer implements Runnable {
         }
         else
             userAwaitingGame = player;
+    }
+
+    private void endGame(BattleInstance battleInstance) {
+        String winnerName;
+
+        Character character = battleInstance.getWinner();
+        if (character == null) winnerName = "nobody";
+        else winnerName = character.getName();
+
+        for (ServerPlayerInfo player : players) {
+            player.sendMessage(MessageTypes.GAME_OVER, winnerName);
+            player.getGameData().setActiveBattle(null);
+            player.getGameData().setPlayerID(-1);
+        }
     }
 
     private void loadUserFromDatabase(ServerPlayerInfo user) throws Exception {

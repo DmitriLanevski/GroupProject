@@ -8,6 +8,8 @@ public class Stats {
     private static HashMap<String, Double> growthRate = new HashMap<>();
 
     static {
+        defaultValues.put("Health", new Stat(100, -100, 100));
+
         everyoneHas("Health");
         everyoneHas("Stamina");
         everyoneHas("Mana");
