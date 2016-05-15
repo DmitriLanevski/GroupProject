@@ -1,6 +1,7 @@
 package gameLogic.characters;
 
 import gameLogic.attributes.Stat;
+import gameLogic.attributes.Stats;
 import gameLogic.buffs.Buff;
 import gameLogic.skills.Skill;
 import gameLogic.skills.Skills;
@@ -49,10 +50,18 @@ public class Character {
     }
 
     public double getStatusValue(String statusName) {
+        if (!status.containsKey(statusName)) {
+            status.put(statusName, Stats.getDefaultValueOf(statusName));
+        }
+
         return status.get(statusName).getValue();
     }
 
     public double changeStatus(String statusName, double amount) {
+        if (!status.containsKey(statusName)) {
+            status.put(statusName, Stats.getDefaultValueOf(statusName));
+        }
+
         System.out.println(statusName + " changed by " + amount);
         return status.get(statusName).changeValueBy(amount);
     }
@@ -121,6 +130,7 @@ public class Character {
     }
 
     public Map<String, Stat> getStatus() {
+
         return status;
     }
 
