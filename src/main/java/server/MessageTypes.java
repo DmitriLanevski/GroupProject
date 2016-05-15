@@ -29,5 +29,9 @@ public class MessageTypes {
 
     public static final int GAME_OVER = 19;
 
+    public static final int REGISTER_USER = 20;
+    public static final int REGISTER_SUCCESS = 21;
+    public static final int REGISTER_FAILURE = 22;
+
     public static final int CLOSE_THREAD = 10000;
 }

@@ -62,7 +62,7 @@ public class Character {
             status.put(statusName, Stats.getDefaultValueOf(statusName));
         }
 
-        System.out.println(statusName + " changed by " + amount);
+        System.out.println(name + ": " + statusName + " changed by " + amount);
         return status.get(statusName).changeValueBy(amount);
     }
 

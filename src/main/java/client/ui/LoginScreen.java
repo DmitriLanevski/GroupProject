@@ -22,6 +22,7 @@ public class LoginScreen extends UIManager {
     TextField IPField = new TextField();
     TextField portField = new TextField();
     Button loginButton = new Button();
+    Button registerButton = new Button();
     Text errorText = new Text();
 
     public LoginScreen(UIManager parentMenu) throws Exception {
@@ -58,6 +59,11 @@ public class LoginScreen extends UIManager {
         loginButton.setLayoutX(0);
         loginButton.setLayoutY(90);
 
+        addChild(registerButton);
+        registerButton.setText("Register");
+        registerButton.setLayoutX(0);
+        registerButton.setLayoutY(120);
+
         loginButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -85,6 +91,27 @@ public class LoginScreen extends UIManager {
                 //handleMessage(new Message(MessageTypes.LOGIN_SUCCESS, "Wrong Password"));
             }
         });
+
+        registerButton.setOnAction((e)->{
+            if (usernameField.getText().isEmpty())
+                Platform.runLater(()->errorText.setText("Enter an username"));
+            else if (passwordField.getText().isEmpty())
+                Platform.runLater(()->errorText.setText("Enter password"));
+            else if (IPField.getText().isEmpty())
+                Platform.runLater(()->errorText.setText("Enter valid IP"));
+            else if (IPField.getText().isEmpty())
+                Platform.runLater(()->errorText.setText("Enter valid port"));
+            else {
+                if (getToServer().connectToServer(IPField.getText(), portField.getText()) ) {
+                    IPField.setEditable(false);
+                    portField.setEditable(false);
+                    getToServer().sendMessage(MessageTypes.REGISTER_USER, new LoginData(usernameField.getText(), Bcrypt.hashpw(passwordField.getText(),Bcrypt.gensalt())));
+                    Platform.runLater(()->errorText.setText("Please Wait"));
+                }
+                else
+                    Platform.runLater(()->errorText.setText("Server not found"));
+            }
+        });
     }
 
     @Override
@@ -94,6 +121,9 @@ public class LoginScreen extends UIManager {
                 getParentManager().activateByName("MainMenu");
                 break;
             case MessageTypes.LOGIN_FAILURE:
+                errorText.setText(message.readAs(String.class));
+                break;
+            case MessageTypes.REGISTER_FAILURE:
                 errorText.setText(message.readAs(String.class));
                 break;
         }

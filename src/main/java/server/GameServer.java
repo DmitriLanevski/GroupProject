@@ -57,6 +57,12 @@ public class GameServer implements Runnable {
                 attemptLogin(data, sender);
                 break;
             }
+            case MessageTypes.REGISTER_USER: {
+                LoginData data = gson.fromJson(message, LoginData.class);
+                if (attemptRegister(data, sender)) {
+                    attemptLogin(data, sender);
+                }
+            }
             case MessageTypes.NEW_CHARACTER: {
                 CharacterData data = gson.fromJson(message, CharacterData.class);
                 sender.getGameData().getCharacters().put(data.getCharName(), data);
@@ -121,6 +127,15 @@ public class GameServer implements Runnable {
         user.sendMessage(MessageTypes.SKILL_STATES, user.getGameData().getActiveBattle().getSkillStatesOfCharacter(user.getGameData().getPlayerID()));
         user.sendMessage(MessageTypes.SELF_CHARACTER_STATUSES, user.getGameData().getActiveBattle().getStatsOfCharacter(user.getGameData().getPlayerID()));
         user.sendMessage(MessageTypes.OPPOSING_CHARACTER_STATUSES, user.getGameData().getActiveBattle().getStatsOfCharacter(BattleInstance.opponentOf(user.getGameData().getPlayerID())));
+    }
+
+    private boolean attemptRegister(LoginData data, ServerPlayerInfo user) throws Exception {
+        if (userDatabase.checkUserExistence(data.userName)) {
+            user.sendMessage(MessageTypes.REGISTER_FAILURE, "User already exists.");
+            return false;
+        }
+        userDatabase.registerUser(data.userName, data.password);
+        return true;
     }
 
     private void attemptLogin(LoginData data, ServerPlayerInfo user) throws Exception {
