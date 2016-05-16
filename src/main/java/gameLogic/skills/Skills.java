@@ -21,7 +21,7 @@ public class Skills {
                 new AttackSkill("Ferocious Strike.phys", 30, -10, "Stamina", 30));
 
         addSkill("Berserk's Strike", "PLACEHOLDER_DESC",
-                new AttackSkill("Berserker Strike.phys", 50, -10, "Stamina", 30));
+                new AttackSkill("Berserker Strike.phys", 50, -10, "Health", 30));
 
         addSkill("Rest to heal", "PLACEHOLDER_DESC",
                 new ChangeStatusSkill("Rest to heal", "Health", 35, -10, "Stamina", 30, true));
