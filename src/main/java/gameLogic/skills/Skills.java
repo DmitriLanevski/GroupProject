@@ -20,7 +20,7 @@ public class Skills {
         addSkill("Ferocious Strike", "PLACEHOLDER_DESC",
                 new AttackSkill("Ferocious Strike.phys", 30, -10, "Stamina", 30));
 
-        addSkill("Berserker Strike", "PLACEHOLDER_DESC",
+        addSkill("Berserk's Strike", "PLACEHOLDER_DESC",
                 new AttackSkill("Berserker Strike.phys", 50, -10, "Stamina", 30));
 
         addSkill("Rest to heal", "PLACEHOLDER_DESC",
@@ -37,7 +37,7 @@ public class Skills {
                         new BuffApplier(Arrays.asList(
                                 new SimpleStatBuff(true, dummyChar, dummyChar, "", "Strength", 20, 20)))));
 
-        addSkill("ortification", "PLACEHOLDER_DESC",
+        addSkill("Fortification", "PLACEHOLDER_DESC",
                 new AddBuffsSkill("Fortification", -10, "Stamina", 30,
                         new BuffApplier(Arrays.asList(
                                 new SimpleStatBuff(true, dummyChar, dummyChar,  "", "Strength", 20, 20)))));
