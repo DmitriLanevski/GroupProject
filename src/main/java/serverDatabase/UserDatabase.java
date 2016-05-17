@@ -1,5 +1,6 @@
 package serverDatabase;
 
+import gameLogic.characters.Character;
 import org.h2.tools.RunScript;
 
 import java.io.IOException;
@@ -35,7 +36,7 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // getCharData return a single Character data based on ID of a character
-    public synchronized CharacterData getCharData(int charID) throws Exception {
+    public synchronized CharacterData getCharData(int charID) throws SQLException {
         List<String> charSkills = showCharSkills(charID);
         Map<String,Long> charStats = showAllStats(charID);
         String checkCommand = "SELECT CharacterName FROM CharacterDatabase WHERE " +
@@ -46,6 +47,34 @@ public class UserDatabase implements AutoCloseable {
         String charName = rs.getString("CharacterName");
         CharacterData theChar = new CharacterData(charID,charName,charSkills,charStats);
         return theChar;
+    }
+
+
+    //TODO: finish the character saving
+    public synchronized boolean saveCharData(CharacterData characterData, String userName) throws SQLException {
+        String checkCommand = "INSERT INTO CharacterName (CharacterId,LoginName,CharacterName,CharacterEXP) VALUES " +
+                "(?,?,?,0);";
+        PreparedStatement statement = conn.prepareStatement(checkCommand);
+        statement.setInt(1,characterData.getCharID());
+        statement.setString(2, userName);
+        statement.setString(3,characterData.getCharName());
+        ResultSet rs = statement.executeQuery();
+        saveChar(characterData);
+        return rs.first();
+    }
+    public synchronized boolean saveChar(CharacterData characterData) throws SQLException {
+        String checkCommand = "INSERT INTO CharData (CharacterId,StatName,StatValue) VALUES " +
+                "(?,?,?);";
+        PreparedStatement statement = conn.prepareStatement(checkCommand);
+        statement.setInt(1,characterData.getCharID());
+        Map<String,Long> theMap = characterData.getStatIDs();
+        for ( String key : theMap.keySet() ) {
+            statement.setString(2, key);
+            statement.setLong(3,theMap.get(key));
+            ResultSet rs = statement.executeQuery();
+        }
+        assignSkill(characterData.getCharID(),characterData.getSkillIDs());
+        return true;
     }
 
     public UserDatabase() throws SQLException, IOException {
@@ -231,27 +260,27 @@ public class UserDatabase implements AutoCloseable {
     }
 
     // Controls if a skill exists. Prevents Players from assigning non-existing skills to themselves
-    public synchronized boolean checkSkillExistence(int skillID) throws SQLException {
+    public synchronized boolean checkSkillExistence(String skillName) throws SQLException {
         String checkCommand = "SELECT SkillName FROM Skills WHERE " +
-                "SkillID = ?;";
+                "SkillName = ?;";
         PreparedStatement statement = conn.prepareStatement(checkCommand);
-        statement.setInt(1,skillID);
+        statement.setString(1,skillName);
         ResultSet rs =statement.executeQuery();
         while (rs.next()) return true;
         return false;
     }
 
-    public synchronized boolean assignSkill(int charID, int[] skillIDs) throws SQLException {
+    public synchronized boolean assignSkill(int charID, List<String> skillName) throws SQLException {
         String checkCommand = "DELETE FROM SkillAssign WHERE CharacterID = ?;";
         PreparedStatement statement = conn.prepareStatement(checkCommand);
         statement.setInt(1,charID);
         statement.executeQuery();
-        for (int i = 0; i<skillIDs.length; i++) {
-            if(checkSkillExistence(skillIDs[i])) {
-                checkCommand = "INSERT INTO SkillAssign(CharacterID,SkillID) VALUES (?,?);";
+        for (int i = 0; i<skillName.size(); i++) {
+            if(checkSkillExistence(skillName.get(i))) {
+                checkCommand = "INSERT INTO SkillAssign(CharacterID,SkillName) VALUES (?,?);";
                 statement = conn.prepareStatement(checkCommand);
                 statement.setInt(1, charID);
-                statement.setInt(2, skillIDs[i]);
+                statement.setString(2, skillName.get(i));
                 statement.executeQuery();
             }
             else return false;
