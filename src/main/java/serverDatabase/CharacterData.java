@@ -13,12 +13,14 @@ public class CharacterData{
     private String CharName;
     private List<String> SkillIDs;
     private Map<String,Long> StatIDs;
+    private int CharEXP;
 
-    public CharacterData(int charID, String charName, List<String> skillIDs, Map<String, Long> statIDs) {
+    public CharacterData(int charID, String charName, List<String> skillIDs, Map<String, Long> statIDs, int charEXP) {
         CharID = charID;
         CharName = charName;
         SkillIDs = skillIDs;
         StatIDs = statIDs;
+        CharEXP = charEXP;
     }
 
     public int getCharID() {
@@ -35,5 +37,9 @@ public class CharacterData{
 
     public Map<String, Long> getStatIDs() {
         return StatIDs;
+    }
+
+    public int getCharEXP() {
+        return CharEXP;
     }
 }

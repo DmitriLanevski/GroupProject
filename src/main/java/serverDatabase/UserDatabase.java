@@ -45,22 +45,25 @@ public class UserDatabase implements AutoCloseable {
         statement.setInt(1, charID);
         ResultSet rs = statement.executeQuery();
         String charName = rs.getString("CharacterName");
-        CharacterData theChar = new CharacterData(charID,charName,charSkills,charStats);
+        int charEXP = rs.getInt("EXP");
+        CharacterData theChar = new CharacterData(charID,charName,charSkills,charStats,charEXP);
         return theChar;
     }
 
 
     //TODO: finish the character saving
     public synchronized boolean saveCharData(CharacterData characterData, String userName) throws SQLException {
-        String checkCommand = "INSERT INTO CharacterName (CharacterId,LoginName,CharacterName,CharacterEXP) VALUES " +
-                "(?,?,?,0);";
-        PreparedStatement statement = conn.prepareStatement(checkCommand);
-        statement.setInt(1,characterData.getCharID());
-        statement.setString(2, userName);
-        statement.setString(3,characterData.getCharName());
-        ResultSet rs = statement.executeQuery();
-        saveChar(characterData);
-        return rs.first();
+        if (characterData.getCharID() == -1) {
+            String checkCommand = "INSERT INTO CharacterDatabase (LoginName,CharacterName,CharacterEXP) VALUES " +
+                    "(?,?,0);";
+            PreparedStatement statement = conn.prepareStatement(checkCommand);
+            statement.setString(1, userName);
+            statement.setString(2, characterData.getCharName());
+            ResultSet rs = statement.executeQuery();
+            saveChar(characterData);
+            return rs.first();
+        }
+        return false;
     }
     public synchronized boolean saveChar(CharacterData characterData) throws SQLException {
         String checkCommand = "INSERT INTO CharData (CharacterId,StatName,StatValue) VALUES " +
@@ -72,6 +75,7 @@ public class UserDatabase implements AutoCloseable {
             statement.setString(2, key);
             statement.setLong(3,theMap.get(key));
             ResultSet rs = statement.executeQuery();
+            if(!rs.first()) return false;
         }
         assignSkill(characterData.getCharID(),characterData.getSkillIDs());
         return true;
