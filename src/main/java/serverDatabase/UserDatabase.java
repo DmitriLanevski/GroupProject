@@ -60,22 +60,23 @@ public class UserDatabase implements AutoCloseable {
             statement.setString(1, userName);
             statement.setString(2, characterData.getCharName());
             ResultSet rs = statement.executeQuery();
-            saveChar(characterData);
+            saveChar(characterData,userName);
             return rs.first();
         }
         return false;
     }
-    public synchronized boolean saveChar(CharacterData characterData) throws SQLException {
+    public synchronized boolean saveChar(CharacterData characterData,String username) throws SQLException {
         String checkCommand = "INSERT INTO CharData (CharacterId,StatName,StatValue) VALUES " +
-                "(?,?,?);";
+                "((SELECT CharacterID FROM CharacterDatabase WHERE CharacterName = ? AND LoginName= ?),?,?);";
         PreparedStatement statement = conn.prepareStatement(checkCommand);
-        statement.setInt(1,characterData.getCharID());
+        statement.setString(1,characterData.getCharName());
+        statement.setString(2,username);
         Map<String,Long> theMap = characterData.getStatIDs();
         for ( String key : theMap.keySet() ) {
-            statement.setString(2, key);
-            statement.setLong(3,theMap.get(key));
+            statement.setString(3, key);
+            statement.setLong(4,theMap.get(key));
             ResultSet rs = statement.executeQuery();
-            if(!rs.first()) return false;
+            rs.first();
         }
         assignSkill(characterData.getCharID(),characterData.getSkillIDs());
         return true;
