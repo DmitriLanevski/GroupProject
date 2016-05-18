@@ -66,7 +66,7 @@ public class GameServer implements Runnable {
             }
             case MessageTypes.NEW_CHARACTER: {
                 CharacterData data = gson.fromJson(message, CharacterData.class);
-                if (userDatabase.saveChar(data, sender.getUserName())) {
+                if (userDatabase.saveCharData(data, sender.getUserName())) {
                     sender.getGameData().getCharacters().put(data.getCharName(), data);
                     sender.sendMessage(MessageTypes.CHARACTER_CREATE_SUCCESS, "");
                 } else {

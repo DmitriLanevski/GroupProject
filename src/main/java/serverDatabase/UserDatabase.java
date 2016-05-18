@@ -29,25 +29,33 @@ public class UserDatabase implements AutoCloseable {
         ResultSet rs = statement.executeQuery();
         while (rs.next()) {
             int charID = rs.getInt("CharacterId");
-            CharacterData theChar = getCharData(charID);
+            System.out.println(charID);
+            CharacterData theChar = getCharData(charID,userName);
             charList.add(theChar);
         }
+        System.out.println(charList);
+        if(charList.size() ==1 && charList.get(0) ==null) return charList = new ArrayList<>();
         return charList;
     }
 
     // getCharData return a single Character data based on ID of a character
-    public synchronized CharacterData getCharData(int charID) throws SQLException {
+    public synchronized CharacterData getCharData(int charID, String userName) throws SQLException {
         List<String> charSkills = showCharSkills(charID);
         Map<String,Long> charStats = showAllStats(charID);
-        String checkCommand = "SELECT CharacterName FROM CharacterDatabase WHERE " +
-                "CharacterId = ?;";
+        String checkCommand =
+                "SELECT * FROM CharacterDatabase WHERE " +
+                "CharacterId = ? AND LoginName= ?;";
         PreparedStatement statement = conn.prepareStatement(checkCommand);
         statement.setInt(1, charID);
+        statement.setString(2,userName);
         ResultSet rs = statement.executeQuery();
-        String charName = rs.getString("CharacterName");
-        int charEXP = rs.getInt("EXP");
-        CharacterData theChar = new CharacterData(charID,charName,charSkills,charStats,charEXP);
-        return theChar;
+        if(rs.next()) {
+            String charName = rs.getString("CharacterName");
+            int charEXP = rs.getInt("CharacterEXP");
+            CharacterData theChar = new CharacterData(charID, charName, charSkills, charStats, charEXP);
+            return theChar;
+        }
+        return null;
     }
 
 
@@ -59,24 +67,38 @@ public class UserDatabase implements AutoCloseable {
             PreparedStatement statement = conn.prepareStatement(checkCommand);
             statement.setString(1, userName);
             statement.setString(2, characterData.getCharName());
-            ResultSet rs = statement.executeQuery();
+            statement.execute();
+            int charID = getCharID(characterData,userName);
+            System.out.println(charID);
+            characterData.setCharID(charID);
             saveChar(characterData,userName);
-            return rs.first();
+            return true;
+
         }
         return false;
     }
+    public synchronized int getCharID(CharacterData characterData,String userName) throws SQLException {
+        String selectCommand = "SELECT CharacterId FROM CharacterDatabase WHERE " +
+                "LoginName = ? AND CharacterName = ?;";
+        PreparedStatement statement = conn.prepareStatement(selectCommand);
+        statement.setString(1,userName);
+        statement.setString(2,characterData.getCharName());
+        ResultSet rs = statement.executeQuery();
+        rs.first();
+        return rs.getInt("CharacterId");
+
+    }
+
     public synchronized boolean saveChar(CharacterData characterData,String username) throws SQLException {
         String checkCommand = "INSERT INTO CharData (CharacterId,StatName,StatValue) VALUES " +
-                "((SELECT CharacterID FROM CharacterDatabase WHERE CharacterName = ? AND LoginName= ?),?,?);";
+                "(?,?,?);";
         PreparedStatement statement = conn.prepareStatement(checkCommand);
-        statement.setString(1,characterData.getCharName());
-        statement.setString(2,username);
+        statement.setInt(1,characterData.getCharID());
         Map<String,Long> theMap = characterData.getStatIDs();
         for ( String key : theMap.keySet() ) {
-            statement.setString(3, key);
-            statement.setLong(4,theMap.get(key));
-            ResultSet rs = statement.executeQuery();
-            rs.first();
+            statement.setString(2, key);
+            statement.setLong(3,theMap.get(key));
+            statement.execute();
         }
         assignSkill(characterData.getCharID(),characterData.getSkillIDs());
         return true;
@@ -95,11 +117,12 @@ public class UserDatabase implements AutoCloseable {
     public synchronized static void main(String[] args) throws Exception {
         UserDatabase database = new UserDatabase();
         //System.out.println("checkUserExistence:"+ database.checkUserExistence("Alpha"));
-        System.out.println("registerUser:"+database.registerUser("Admin",Bcrypt.hashpw("GrandAdmin",Bcrypt.gensalt())));
+        //System.out.println("registerUser:"+database.registerUser("Admin",Bcrypt.hashpw("GrandAdmin",Bcrypt.gensalt())));
         //System.out.println("Password Change:"+database.changePassword("Alpha","12345"));
         //System.out.println("checkUserExistence:"+ database.checkUserExistence("Alpha"));
         //System.out.println("logIn:"+database.logIn("Alpha","12345"));
         database.dumpTable();
+        System.out.println(database.getAllChars("A"));
         database.close();
     }
 
@@ -188,10 +211,10 @@ public class UserDatabase implements AutoCloseable {
     // Returns skills that are used by a certain character
     public synchronized List<String> showCharSkills(int CharID) throws SQLException {
         List<String> skillsOfCharN = new ArrayList<>();
-        String allCharSkills = "SELECT SkillName FROM SkillAssign WHERE CharID = ?";
+        String allCharSkills = "SELECT SkillName FROM SkillAssign WHERE CharacterId = ?";
         PreparedStatement stmt = conn.prepareStatement(allCharSkills);
         stmt.setInt(1,CharID);
-        ResultSet rs = stmt.executeQuery(allCharSkills);
+        ResultSet rs = stmt.executeQuery();
         while (rs.next()) {
             String SkillName = rs.getString("SkillName");
             skillsOfCharN.add(SkillName);
@@ -279,14 +302,14 @@ public class UserDatabase implements AutoCloseable {
         String checkCommand = "DELETE FROM SkillAssign WHERE CharacterID = ?;";
         PreparedStatement statement = conn.prepareStatement(checkCommand);
         statement.setInt(1,charID);
-        statement.executeQuery();
+        statement.execute();
         for (int i = 0; i<skillName.size(); i++) {
             if(checkSkillExistence(skillName.get(i))) {
                 checkCommand = "INSERT INTO SkillAssign(CharacterID,SkillName) VALUES (?,?);";
                 statement = conn.prepareStatement(checkCommand);
                 statement.setInt(1, charID);
                 statement.setString(2, skillName.get(i));
-                statement.executeQuery();
+                statement.execute();
             }
             else return false;
         }
@@ -319,10 +342,13 @@ public class UserDatabase implements AutoCloseable {
 
     // prints out certain requested data. Currently used to control if stuff we add is actually added.
     public synchronized void dumpTable() throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement("SELECT * from UserDatabase")) {
+        try (PreparedStatement ps = conn.prepareStatement(
+                "SELECT * FROM CharacterDatabase;")) {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                System.out.println(rs.getString("LoginName") + "\t" + rs.getString("Password"));
+                System.out.println(rs.getString("CharacterName"));
+                System.out.println(rs.getString("LoginName"));
+                //System.out.println(rs.getString());
             }
         }
     }

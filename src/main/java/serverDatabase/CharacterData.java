@@ -23,6 +23,9 @@ public class CharacterData{
         CharEXP = charEXP;
     }
 
+    public void setCharID(int charID) {
+        CharID = charID;
+    }
     public int getCharID() {
         return CharID;
     }
