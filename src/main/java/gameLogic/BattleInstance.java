@@ -17,10 +17,14 @@ public class BattleInstance {
 
     private final Character[] players = new Character[2];
     private final List<ServerPlayerInfo> users = new ArrayList<>();
+    private final List<String> eventLog = new ArrayList<>();
 
     private final ScheduledExecutorService ticker = new ScheduledThreadPoolExecutor(1);
 
     public BattleInstance(Character player0, Character player1) {
+        player0.setEventLog(eventLog);
+        player1.setEventLog(eventLog);
+
         players[0] = player0;
         players[1] = player1;
 
@@ -36,8 +40,13 @@ public class BattleInstance {
     public synchronized void tick() {
         if (over) return;
 
+
         players[0].tick();
         players[1].tick();
+
+        for (Character player : players) {
+            player.cleanBuffList();
+        }
 
         checkForDeaths();
     }
@@ -59,6 +68,9 @@ public class BattleInstance {
 
         players[playerID].useSkill(skillName);
 
+        for (Character player : players) {
+            player.cleanBuffList();
+        }
         checkForDeaths();
     }
 

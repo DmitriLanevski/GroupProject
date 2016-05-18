@@ -23,6 +23,8 @@ import java.util.*;
 public class CharacterCreateScreen extends UIManager {
     TextField nameField = new TextField();
 
+    HBox allTheStuff = new HBox();
+
     HashMap<String, Button> skillButtons = new HashMap<>();
     VBox skillList = new VBox();
     VBox chosenSkillList = new VBox();
@@ -38,17 +40,12 @@ public class CharacterCreateScreen extends UIManager {
     public CharacterCreateScreen(UIManager parentManager) {
         super(parentManager);
 
-        addChild(nameField);
-        addChild(skillList);
-        addChild(chosenSkillList);
-        addChild(statsList);
-
-        skillList.setLayoutX(150);
-        skillList.setLayoutY(30);
-        chosenSkillList.setLayoutX(270);
-        chosenSkillList.setLayoutY(30);
-        statsList.setLayoutX(400);
-        statsList.setLayoutY(30);
+        addChild(allTheStuff);
+        allTheStuff.getChildren().add(nameField);
+        allTheStuff.getChildren().add(skillList);
+        allTheStuff.getChildren().add(chosenSkillList);
+        allTheStuff.getChildren().add(statsList);
+        allTheStuff.setLayoutY(30);
 
         Button cancelButton = new Button("Cancel");
         addChild(cancelButton);

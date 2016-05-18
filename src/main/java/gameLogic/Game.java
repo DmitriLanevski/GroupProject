@@ -33,6 +33,7 @@ public class Game {
 
         for (String statID : rawData.getStatIDs().keySet()) {
             stats.get(statID).increaseMax(Stats.getGrowthRateOf(statID)*rawData.getStatIDs().get(statID));
+            if (Stats.getDefaultValueOf(statID).getValue() == 0) stats.get(statID).setValue(0);
         }
 
         return new Character(rawData.getCharName(), skills, stats);

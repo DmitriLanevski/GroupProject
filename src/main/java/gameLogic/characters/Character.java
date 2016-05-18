@@ -19,6 +19,8 @@ public class Character {
 
     private Character opponent;
 
+    private List<String> eventLog;
+
     public Character(String name, Map<String, Integer> skills, Map<String, Stat> status) {
         this.name = name;
         this.skills = skills;
@@ -62,6 +64,9 @@ public class Character {
             status.put(statusName, Stats.getDefaultValueOf(statusName));
         }
 
+        if (amount > 0) writeToLog(name + " gained " + amount + " " + statusName);
+        else if (amount < 0) writeToLog(name + " lost " + amount + " " + statusName);
+
         System.out.println(name + ": " + statusName + " changed by " + amount);
         return status.get(statusName).changeValueBy(amount);
     }
@@ -102,6 +107,7 @@ public class Character {
     public void useSkill(String skillName) {
         if (!canUseSkill(skillName)) return;
 
+        writeToLog(name + " used skill " + skillName);
         System.out.println(name + " used skill " + skillName);
 
         Skills.getSkillByName(skillName).use(this, opponent);
@@ -136,6 +142,20 @@ public class Character {
 
     public String getName() {
         return name;
+    }
+
+    public List<String> getEventLog() {
+        return eventLog;
+    }
+
+    public void writeToLog(String entry) {
+        if (eventLog != null) {
+            eventLog.add(entry);
+        }
+    }
+
+    public void setEventLog(List<String> eventLog) {
+        this.eventLog = eventLog;
     }
 
     @Override

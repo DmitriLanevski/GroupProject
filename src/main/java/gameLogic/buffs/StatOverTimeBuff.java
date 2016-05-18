@@ -18,6 +18,7 @@ public class StatOverTimeBuff extends Buff {
 
     @Override
     public void onTick() {
+        super.onTick();
         getUser().eventChangeStatusBy(statusName, changePerTick);
     }
 }

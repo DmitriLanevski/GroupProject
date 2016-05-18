@@ -9,6 +9,7 @@ public class Stats {
 
     static {
         defaultValues.put("Health", new Stat(100, -100, 100));
+        defaultValues.put("Static charge", new Stat(0, 0, 10));
 
         everyoneHas("Health");
         everyoneHas("Stamina");

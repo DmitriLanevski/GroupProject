@@ -1,8 +1,6 @@
 package gameLogic.skills;
 
-import gameLogic.buffs.Buff;
-import gameLogic.buffs.BuffApplier;
-import gameLogic.buffs.SimpleStatBuff;
+import gameLogic.buffs.*;
 import gameLogic.characters.Character;
 
 import java.util.ArrayList;
@@ -51,6 +49,36 @@ public class Skills {
                 new AddBuffsSkill("Force shield", -10, "Mana", 30,
                         new BuffApplier(Arrays.asList(
                                 new SimpleStatBuff(true, dummyChar, dummyChar,  "", "Defence", 20, 20)))));
+
+        addSkill("[Passive] Regeneration", "Gain 0.1 health, mana and stamina each tick.",
+                new PassiveSkill("Regeneration",
+                        new BuffApplier( Arrays.asList(
+                                new StatOverTimeBuff(true, dummyChar, dummyChar, "", "Health", -1, 0.1),
+                                new StatOverTimeBuff(true, dummyChar, dummyChar, "", "Stamina", -1, 0.1),
+                                new StatOverTimeBuff(true, dummyChar, dummyChar, "", "Mana", -1, 0.1)
+                        ))
+                )
+        );
+
+        addSkill("[Passive] Berserker's endurance", "Adds 100% of damage taken as stamina.",
+                new PassiveSkill("Berserker's endurance",
+                        new BuffApplier( Arrays.asList(
+                                new DamageConversionBuff(true, dummyChar, dummyChar, "", -1, 1, "Stamina")
+                        ))
+                )
+        );
+
+        addSkill("[Passive] Static charge", "Adds 100% of mana used as static charge. Static charge occasionally unloads itself.",
+                new PassiveSkill("Berserker's endurance",
+                        new BuffApplier( Arrays.asList(
+                                new LossConversionBuff(true, dummyChar, dummyChar, "", -1, 1, "Mana", "Static charge"),
+                                new StaticStormBuff(true, dummyChar, dummyChar, "", -1, 0.1, 0.1, 1)
+                        ))
+                )
+        );
+        getSkillByName("[Passive] Static charge").addRequiredStat("Static charge");
+
+
     }
 
     private static void addSkill(String name, String desc, Skill skill) {

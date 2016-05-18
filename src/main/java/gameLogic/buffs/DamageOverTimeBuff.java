@@ -16,6 +16,7 @@ public class DamageOverTimeBuff extends Buff {
 
     @Override
     public void onTick() {
+        super.onTick();
         getUser().eventDealDamage(damagePerTick);
     }
 }
