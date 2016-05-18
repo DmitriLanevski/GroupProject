@@ -80,7 +80,7 @@ public class GameServer implements Runnable {
                     break;
                 }
 
-                if (userDatabase.saveChar(data, sender.getUserName())) {
+                if (userDatabase.saveCharData(data, sender.getUserName())) {
                     sender.getGameData().getCharacters().put(data.getCharName(), data);
                     sender.sendMessage(MessageTypes.CHARACTER_CREATE_SUCCESS, "");
                 } else {
