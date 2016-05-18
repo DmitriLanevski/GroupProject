@@ -62,11 +62,16 @@ public class GameServer implements Runnable {
                 if (attemptRegister(data, sender)) {
                     attemptLogin(data, sender);
                 }
+                break;
             }
             case MessageTypes.NEW_CHARACTER: {
                 CharacterData data = gson.fromJson(message, CharacterData.class);
-                sender.getGameData().getCharacters().put(data.getCharName(), data);
-                sender.sendMessage(MessageTypes.CHARACTER_CREATE_SUCCESS, "");
+                if (userDatabase.saveChar(data, sender.getUserName())) {
+                    sender.getGameData().getCharacters().put(data.getCharName(), data);
+                    sender.sendMessage(MessageTypes.CHARACTER_CREATE_SUCCESS, "");
+                } else {
+                    sender.sendMessage(MessageTypes.CHARACTER_CREATE_FAILURE, "Character with this name already exists.");
+                }
                 break;
             }
             case MessageTypes.REQUEST_CHARACTERS: {

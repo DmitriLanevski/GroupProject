@@ -31,6 +31,8 @@ public class CharacterCreateScreen extends UIManager {
     HashMap<String, StatButtons> statButtons = new HashMap<>();
     VBox statsList = new VBox();
 
+    Text errorMessage = new Text();
+
     public CharacterCreateScreen(UIManager parentManager) {
         super(parentManager);
 
@@ -52,6 +54,10 @@ public class CharacterCreateScreen extends UIManager {
         addChild(acceptButton);
         acceptButton.setLayoutY(100);
         acceptButton.setLayoutX(80);
+
+        addChild(errorMessage);
+        errorMessage.setLayoutX(80+50);
+        errorMessage.setLayoutY(100);
 
         acceptButton.setOnAction((e)->Platform.runLater(this::createdCharacter));
     }
@@ -130,6 +136,9 @@ public class CharacterCreateScreen extends UIManager {
             }
             case MessageTypes.CHARACTER_CREATE_SUCCESS: {
                 activateByName("MainMenu");
+            }
+            case MessageTypes.CHARACTER_CREATE_FAILURE: {
+                errorMessage.setText(message.readAs(String.class));
             }
         }
     }
