@@ -61,7 +61,7 @@ public class CharacterCreateScreen extends UIManager {
         for (String statName : statButtons.keySet()) {
             stats.put(statName, (long)statButtons.get(statName).getSpentPoints());
         }
-        CharacterData data = new CharacterData(-1, nameField.getText(), chosenSkills, stats);
+        CharacterData data = new CharacterData(-1, nameField.getText(), chosenSkills, stats,0);
         getToServer().sendMessage(MessageTypes.NEW_CHARACTER, data);
     }
 
