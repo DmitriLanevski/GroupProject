@@ -66,7 +66,21 @@ public class GameServer implements Runnable {
             }
             case MessageTypes.NEW_CHARACTER: {
                 CharacterData data = gson.fromJson(message, CharacterData.class);
-                if (userDatabase.saveCharData(data, sender.getUserName())) {
+
+                int skillPointSum = 0;
+                for (Long statPoints : data.getStatIDs().values()) {
+                    skillPointSum += statPoints;
+                }
+                if (skillPointSum > 20) {
+                    sender.sendMessage(MessageTypes.CHARACTER_CREATE_FAILURE, "Too many skillpoints allocated.");
+                    break;
+                }
+                if (data.getSkillIDs().size() > 5) {
+                    sender.sendMessage(MessageTypes.CHARACTER_CREATE_FAILURE, "Too many skills allocated.");
+                    break;
+                }
+
+                if (userDatabase.saveChar(data, sender.getUserName())) {
                     sender.getGameData().getCharacters().put(data.getCharName(), data);
                     sender.sendMessage(MessageTypes.CHARACTER_CREATE_SUCCESS, "");
                 } else {
@@ -144,6 +158,13 @@ public class GameServer implements Runnable {
     }
 
     private void attemptLogin(LoginData data, ServerPlayerInfo user) throws Exception {
+        for (ServerPlayerInfo player : players) {
+            if (player.getUserName().equals(data.userName)) {
+                user.sendMessage(MessageTypes.LOGIN_FAILURE, "This user is already logged in.");
+                return;
+            }
+        }
+
         if (verifyLogin(data.userName, data.password)) {
             user.setUserName(data.userName);
             user.setLoggedIn(true);
