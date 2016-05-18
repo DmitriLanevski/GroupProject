@@ -32,6 +32,8 @@ public class CharacterCreateScreen extends UIManager {
     VBox statsList = new VBox();
 
     Text errorMessage = new Text();
+    Text skillsLeft = new Text();
+    Text skillPointsLeft = new Text();
 
     public CharacterCreateScreen(UIManager parentManager) {
         super(parentManager);
@@ -42,8 +44,11 @@ public class CharacterCreateScreen extends UIManager {
         addChild(statsList);
 
         skillList.setLayoutX(150);
+        skillList.setLayoutY(30);
         chosenSkillList.setLayoutX(270);
+        chosenSkillList.setLayoutY(30);
         statsList.setLayoutX(400);
+        statsList.setLayoutY(30);
 
         Button cancelButton = new Button("Cancel");
         addChild(cancelButton);
@@ -56,8 +61,15 @@ public class CharacterCreateScreen extends UIManager {
         acceptButton.setLayoutX(80);
 
         addChild(errorMessage);
-        errorMessage.setLayoutX(80+50);
-        errorMessage.setLayoutY(100);
+        errorMessage.setLayoutY(150);
+
+        addChild(skillsLeft);
+        skillsLeft.setLayoutX(150);
+        skillsLeft.setLayoutY(15);
+
+        addChild(skillPointsLeft);
+        skillPointsLeft.setLayoutX(400);
+        skillPointsLeft.setLayoutY(15);
 
         acceptButton.setOnAction((e)->Platform.runLater(this::createdCharacter));
     }
@@ -85,6 +97,8 @@ public class CharacterCreateScreen extends UIManager {
             skillList.getChildren().add(button);
             getToServer().sendMessage(MessageTypes.REQUEST_SKILLS_ALTERABLE_STATS, chosenSkills);
         }
+
+        skillsLeft.setText( 5 - chosenSkills.size() + " skills left to choose." );
     }
 
     @Override
@@ -131,6 +145,7 @@ public class CharacterCreateScreen extends UIManager {
                         statsList.getChildren().add(buttons);
                     }
                 }
+                updateSkillPointsLeftText();
 
                 break;
             }
@@ -143,6 +158,14 @@ public class CharacterCreateScreen extends UIManager {
         }
     }
 
+    private void updateSkillPointsLeftText() {
+        int sum = 0;
+        for (StatButtons buttons : statButtons.values()) {
+            sum += buttons.getSpentPoints();
+        }
+        skillPointsLeft.setText(20 - sum + " skill points left to allocate.");
+    }
+
     @Override
     protected void onActivate() {
         skillButtons.clear();
@@ -152,6 +175,10 @@ public class CharacterCreateScreen extends UIManager {
 
         statButtons.clear();
         statsList.getChildren().clear();
+
+        errorMessage.setText("");
+        skillsLeft.setText("5 skills left to choose.");
+
 
         getToServer().sendMessage(MessageTypes.REQUEST_ALL_SKILLS, "");
         getToServer().sendMessage(MessageTypes.REQUEST_SKILLS_ALTERABLE_STATS, chosenSkills);
@@ -204,6 +231,7 @@ public class CharacterCreateScreen extends UIManager {
         private void updateText(){
             amount.setText(Double.toString(defaultMax+growthRate*skillPointsAllocated));
             skillPoints.setText(Integer.toString(skillPointsAllocated));
+            updateSkillPointsLeftText();
         }
     }
 }

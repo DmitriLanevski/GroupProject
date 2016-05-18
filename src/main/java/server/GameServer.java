@@ -66,6 +66,20 @@ public class GameServer implements Runnable {
             }
             case MessageTypes.NEW_CHARACTER: {
                 CharacterData data = gson.fromJson(message, CharacterData.class);
+
+                int skillPointSum = 0;
+                for (Long statPoints : data.getStatIDs().values()) {
+                    skillPointSum += statPoints;
+                }
+                if (skillPointSum > 20) {
+                    sender.sendMessage(MessageTypes.CHARACTER_CREATE_FAILURE, "Too many skillpoints allocated.");
+                    break;
+                }
+                if (data.getSkillIDs().size() > 5) {
+                    sender.sendMessage(MessageTypes.CHARACTER_CREATE_FAILURE, "Too many skills allocated.");
+                    break;
+                }
+
                 if (userDatabase.saveChar(data, sender.getUserName())) {
                     sender.getGameData().getCharacters().put(data.getCharName(), data);
                     sender.sendMessage(MessageTypes.CHARACTER_CREATE_SUCCESS, "");
