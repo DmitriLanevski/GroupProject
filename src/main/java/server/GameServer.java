@@ -158,6 +158,13 @@ public class GameServer implements Runnable {
     }
 
     private void attemptLogin(LoginData data, ServerPlayerInfo user) throws Exception {
+        for (ServerPlayerInfo player : players) {
+            if (player.getUserName().equals(data.userName)) {
+                user.sendMessage(MessageTypes.LOGIN_FAILURE, "This user is already logged in.");
+                return;
+            }
+        }
+
         if (verifyLogin(data.userName, data.password)) {
             user.setUserName(data.userName);
             user.setLoggedIn(true);
