@@ -253,6 +253,12 @@ public class GameServer implements Runnable {
         ) {
             this.userDatabase = userDatabase; // kinda silly, but automatically closes the database
 
+            for (String skillName : Skills.getAllSkillDescriptions().keySet()) {
+                if (!userDatabase.checkSkillExistence(skillName)) {
+                    userDatabase.createSkill(skillName, Skills.getSkillDescByName(skillName));
+                }
+            }
+
             while (!serverSocket.isClosed()) {
                 Socket socket = serverSocket.accept();
 
@@ -332,11 +338,13 @@ public class GameServer implements Runnable {
             }
             finally {
                 players.remove(data);
-                data.getGameData().getActiveBattle().close();
-                for (ServerPlayerInfo serverPlayerInfo : data.getGameData().getActiveBattle().getInformedUsers()) {
-                    serverPlayerInfo.getGameData().setPlayerID(-1);
-                    serverPlayerInfo.getGameData().setActiveBattle(null);
-                    serverPlayerInfo.sendMessage(MessageTypes.GAME_OVER, "NOBODY");
+                if (data.getGameData().getActiveBattle() != null) {
+                    data.getGameData().getActiveBattle().close();
+                    for (ServerPlayerInfo serverPlayerInfo : data.getGameData().getActiveBattle().getInformedUsers()) {
+                        serverPlayerInfo.getGameData().setPlayerID(-1);
+                        serverPlayerInfo.getGameData().setActiveBattle(null);
+                        serverPlayerInfo.sendMessage(MessageTypes.GAME_OVER, "NOBODY");
+                    }
                 }
             }
         }
