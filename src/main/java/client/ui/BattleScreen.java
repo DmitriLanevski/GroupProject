@@ -16,6 +16,7 @@ import javafx.util.Duration;
 import server.Message;
 import server.MessageTypes;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -23,6 +24,8 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Created by madis_000 on 12/05/2016.
  */
 public class BattleScreen extends UIManager {
+    private static DecimalFormat df = new DecimalFormat("#.#");
+
     HBox skillButtonsRoot = new HBox();
     HashMap<String, Button> skillButtons = new HashMap<>();
     Map<String, StatDisplay> selfstats = new HashMap<>();
@@ -43,7 +46,7 @@ public class BattleScreen extends UIManager {
         addChild(selfStatsRoot);
 
         addChild(enemyStatsRoot);
-        enemyStatsRoot.setLayoutX(760);
+        enemyStatsRoot.setLayoutX(660);
 
         timer = new AnimationTimer() {
             long sinceLastWrite = 0;
@@ -175,7 +178,7 @@ public class BattleScreen extends UIManager {
 
         void update(Stat stat) {
             disp.setProgress(stat.getValue()/stat.getMax());
-            dispText.setText( Double.toString(stat.getValue())+"/"+Double.toString(stat.getMax()) );
+            dispText.setText( df.format(stat.getValue())+"/"+df.format(stat.getMax()) );
         }
     }
 }

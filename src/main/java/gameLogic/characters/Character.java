@@ -6,12 +6,15 @@ import gameLogic.buffs.Buff;
 import gameLogic.skills.Skill;
 import gameLogic.skills.Skills;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Character {
+    private static DecimalFormat df = new DecimalFormat("#.#");
+
     private String name;
     private Map<String, Stat> status;
     private Map<String, Integer> skills;
@@ -68,8 +71,8 @@ public class Character {
 
         double change = status.get(statusName).changeValueBy(amount);
 
-        if (change > 0.5) writeToLog(name + " gained " + change + " " + statusName);
-        else if (change < -0.5) writeToLog(name + " lost " + change + " " + statusName);
+        if (change > 0.5) writeToLog(name + " gained " + df.format(change) + " " + statusName);
+        else if (change < -0.5) writeToLog(name + " lost " + df.format(-change) + " " + statusName);
 
         return change;
     }
