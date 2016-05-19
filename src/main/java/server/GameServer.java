@@ -219,10 +219,12 @@ public class GameServer implements Runnable {
         if (character == null) winnerName = "nobody";
         else winnerName = character.getName();
 
-        for (ServerPlayerInfo player : players) {
-            player.sendMessage(MessageTypes.GAME_OVER, winnerName);
-            player.getGameData().setActiveBattle(null);
-            player.getGameData().setPlayerID(-1);
+        synchronized (battleInstance) {
+            for (ServerPlayerInfo player : battleInstance.getInformedUsers()) {
+                player.sendMessage(MessageTypes.GAME_OVER, winnerName);
+                player.getGameData().setActiveBattle(null);
+                player.getGameData().setPlayerID(-1);
+            }
         }
     }
 
