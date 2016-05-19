@@ -61,7 +61,7 @@ public class BattleScreen extends UIManager {
                 if (seconds > 0.05) {
                     String event = battleLog.poll();
                     if (event != null) {
-                        PathTransition path = new PathTransition(new Duration(1500), new Line(500, 300, 500, 0));
+                        PathTransition path = new PathTransition(new Duration(2000), new Line(500, 300, 500, 0));
 
                         Text eventText = new Text(event);
                         addChild(eventText);
