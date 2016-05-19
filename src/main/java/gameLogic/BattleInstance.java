@@ -4,10 +4,7 @@ import gameLogic.attributes.Stat;
 import gameLogic.characters.Character;
 import server.ServerPlayerInfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +14,7 @@ public class BattleInstance {
 
     private final Character[] players = new Character[2];
     private final List<ServerPlayerInfo> users = new ArrayList<>();
-    private final List<String> eventLog = new ArrayList<>();
+    private final List<String> eventLog = Collections.synchronizedList(new ArrayList<>());
 
     private final ScheduledExecutorService ticker = new ScheduledThreadPoolExecutor(1);
 
@@ -115,5 +112,13 @@ public class BattleInstance {
         } else {
             return players[0];
         }
+    }
+
+    public synchronized List<String> getEventLog() {
+        return eventLog;
+    }
+
+    public synchronized void close() {
+        ticker.shutdown();
     }
 }

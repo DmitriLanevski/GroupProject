@@ -127,6 +127,8 @@ public class GameServer implements Runnable {
             case MessageTypes.SKILL_USE: {
                 BattleInstance battleInstance = sender.getGameData().getActiveBattle();
                 synchronized (battleInstance) {
+                    battleInstance.getEventLog().clear();
+
                     battleInstance.skillUse( sender.getGameData().getPlayerID(), gson.fromJson(message, String.class) );
                     for (ServerPlayerInfo user : battleInstance.getInformedUsers()) {
                         sendBattleStats(user);
@@ -146,6 +148,7 @@ public class GameServer implements Runnable {
         user.sendMessage(MessageTypes.SKILL_STATES, user.getGameData().getActiveBattle().getSkillStatesOfCharacter(user.getGameData().getPlayerID()));
         user.sendMessage(MessageTypes.SELF_CHARACTER_STATUSES, user.getGameData().getActiveBattle().getStatsOfCharacter(user.getGameData().getPlayerID()));
         user.sendMessage(MessageTypes.OPPOSING_CHARACTER_STATUSES, user.getGameData().getActiveBattle().getStatsOfCharacter(BattleInstance.opponentOf(user.getGameData().getPlayerID())));
+        user.sendMessage(MessageTypes.BATTLE_EVENT_LOG, user.getGameData().getActiveBattle().getEventLog());
     }
 
     private boolean attemptRegister(LoginData data, ServerPlayerInfo user) throws Exception {
@@ -197,6 +200,7 @@ public class GameServer implements Runnable {
 
             battle.setUpTicking(()->{
                 synchronized (battle) {
+                    battle.getEventLog().clear();
                     battle.tick();
                     for (ServerPlayerInfo user : battle.getInformedUsers()) {
                         sendBattleStats(user);
@@ -328,6 +332,12 @@ public class GameServer implements Runnable {
             }
             finally {
                 players.remove(data);
+                data.getGameData().getActiveBattle().close();
+                for (ServerPlayerInfo serverPlayerInfo : data.getGameData().getActiveBattle().getInformedUsers()) {
+                    serverPlayerInfo.getGameData().setPlayerID(-1);
+                    serverPlayerInfo.getGameData().setActiveBattle(null);
+                    serverPlayerInfo.sendMessage(MessageTypes.GAME_OVER, "NOBODY");
+                }
             }
         }
     }

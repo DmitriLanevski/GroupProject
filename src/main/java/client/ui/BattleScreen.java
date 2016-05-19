@@ -1,23 +1,23 @@
 package client.ui;
 
 import com.google.gson.Gson;
-import gameLogic.attributes.CharacterGenerationStatData;
 import gameLogic.attributes.Stat;
+import javafx.animation.AnimationTimer;
+import javafx.animation.PathTransition;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Tooltip;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import server.Message;
 import server.MessageTypes;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by madis_000 on 12/05/2016.
@@ -30,6 +30,8 @@ public class BattleScreen extends UIManager {
     Map<String, StatDisplay> enemystats = new HashMap<>();
     VBox enemyStatsRoot = new VBox();
 
+    Queue<String> battleLog = new LinkedBlockingQueue<>();
+    AnimationTimer timer;
 
     public BattleScreen(UIManager parentManager) {
         super(parentManager);
@@ -42,6 +44,35 @@ public class BattleScreen extends UIManager {
 
         addChild(enemyStatsRoot);
         enemyStatsRoot.setLayoutX(760);
+
+        timer = new AnimationTimer() {
+            long sinceLastWrite = 0;
+            long lastNow;
+
+            @Override
+            public void handle(long now) {
+
+                sinceLastWrite += now-lastNow;
+                lastNow = now;
+                double seconds = sinceLastWrite /  1000000000.0;
+                if (seconds > 0.05) {
+                    String event = battleLog.poll();
+                    if (event != null) {
+                        PathTransition path = new PathTransition(new Duration(1500), new Line(500, 300, 500, 0));
+
+                        Text eventText = new Text(event);
+                        addChild(eventText);
+                        path.setNode(eventText);
+                        path.play();
+
+                        path.setOnFinished((e)->getRoot().getChildren().remove(eventText));
+
+                        sinceLastWrite = 0;
+                    }
+                }
+            }
+        };
+        timer.start();
     }
 
     @Override
@@ -121,6 +152,11 @@ public class BattleScreen extends UIManager {
             }
             case MessageTypes.GAME_OVER: {
                 getParentManager().activate(new GameOverScreen(getParentManager(), message.readAs(String.class)));
+                break;
+            }
+            case MessageTypes.BATTLE_EVENT_LOG: {
+                battleLog.addAll(message.readAs(List.class));
+                break;
             }
         }
     }

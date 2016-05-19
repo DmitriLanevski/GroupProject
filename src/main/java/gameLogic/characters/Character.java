@@ -64,11 +64,14 @@ public class Character {
             status.put(statusName, Stats.getDefaultValueOf(statusName));
         }
 
-        if (amount > 0) writeToLog(name + " gained " + amount + " " + statusName);
-        else if (amount < 0) writeToLog(name + " lost " + amount + " " + statusName);
-
         System.out.println(name + ": " + statusName + " changed by " + amount);
-        return status.get(statusName).changeValueBy(amount);
+
+        double change = status.get(statusName).changeValueBy(amount);
+
+        if (change > 0.5) writeToLog(name + " gained " + change + " " + statusName);
+        else if (change < -0.5) writeToLog(name + " lost " + change + " " + statusName);
+
+        return change;
     }
 
     public void eventChangeStatusBy(String statusName, double amount) {
